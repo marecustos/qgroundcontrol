@@ -112,6 +112,7 @@ LogDownloadController::LogDownloadController(void)
     , _retries(0)
     , _apmOneBased(0)
 {
+    qCDebug(LogDownloadLog) << "started log download controller for debuggong";
     MultiVehicleManager *manager = qgcApp()->toolbox()->multiVehicleManager();
     connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &LogDownloadController::_setActiveVehicle);
     connect(&_timer, &QTimer::timeout, this, &LogDownloadController::_processDownload);

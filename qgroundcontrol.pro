@@ -390,6 +390,7 @@ INCLUDEPATH += \
     src/ADSB \
     src/api \
     src/AnalyzeView \
+    src/PayLoad \
     src/Camera \
     src/AutoPilotPlugins \
     src/FlightDisplay \
@@ -560,6 +561,7 @@ HEADERS += \
     src/ADSB/ADSBVehicle.h \
     src/ADSB/ADSBVehicleManager.h \
     src/AnalyzeView/LogDownloadController.h \
+    src/PayLoad/payload.h \
     src/AnalyzeView/PX4LogParser.h \
     src/AnalyzeView/ULogParser.h \
     src/AnalyzeView/MavlinkConsoleController.h \
@@ -766,7 +768,6 @@ AndroidBuild {
 SOURCES += \
     src/ADSB/ADSBVehicle.cc \
     src/ADSB/ADSBVehicleManager.cc \
-    src/AnalyzeView/LogDownloadController.cc \
     src/AnalyzeView/PX4LogParser.cc \
     src/AnalyzeView/ULogParser.cc \
     src/AnalyzeView/MavlinkConsoleController.cc \

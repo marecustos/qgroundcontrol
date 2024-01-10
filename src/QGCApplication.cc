@@ -73,6 +73,7 @@
 #include "VideoManager.h"
 #include "VideoReceiver.h"
 #include "LogDownloadController.h"
+#include "payload.h"
 #if defined(QGC_ENABLE_MAVLINK_INSPECTOR)
 #include "MAVLinkInspectorController.h"
 #endif
@@ -534,6 +535,7 @@ void QGCApplication::_initCommon()
     qmlRegisterType<RCChannelMonitorController>     (kQGCControllers,                       1, 0, "RCChannelMonitorController");
     qmlRegisterType<JoystickConfigController>       (kQGCControllers,                       1, 0, "JoystickConfigController");
     qmlRegisterType<LogDownloadController>          (kQGCControllers,                       1, 0, "LogDownloadController");
+    qmlRegisterType<PayloadController>          (kQGCControllers,                       1, 0, "PayloadController");
     qmlRegisterType<SyslinkComponentController>     (kQGCControllers,                       1, 0, "SyslinkComponentController");
     qmlRegisterType<EditPositionDialogController>   (kQGCControllers,                       1, 0, "EditPositionDialogController");
 

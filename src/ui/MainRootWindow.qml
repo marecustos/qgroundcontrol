@@ -105,6 +105,7 @@ ApplicationWindow {
         analyzeWindow.visible   = false
         flightView.visible      = false
         planViewLoader.visible  = false
+        payloadWindow.visible   = false
         if(isPlanView) {
             toolbar.source  = _planToolbar
         } else {
@@ -129,6 +130,11 @@ ApplicationWindow {
     function showAnalyzeView() {
         viewSwitch(false)
         analyzeWindow.visible = true
+    }
+
+    function showPayload() {
+        viewSwitch(false)
+        payloadWindow.visible = true
     }
 
     function showSetupView() {
@@ -389,6 +395,16 @@ ApplicationWindow {
     }
 
     //-------------------------------------------------------------------------
+    /// Payload
+    Loader {
+        id:             payloadWindow
+        anchors.fill:   parent
+        visible:        false
+        source:         "Payload.qml"
+    }
+
+    //-------------------------------------------------------------------------
+
     //   @brief Loader helper for any child, no matter how deep, to display elements
     //   on top of the main window.
     //   This is DEPRECATED. Use Popup instead.

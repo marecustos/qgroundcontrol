@@ -186,6 +186,20 @@ Item {
                     }
                 }
 
+                QGCToolBarButton {
+                    id:                 customButton
+                    Layout.fillHeight:  true
+                    icon.source:        "/qmlimages/robotics_arm.svg"
+                    onClicked: {
+                        if (mainWindow.preventViewSwitch()) {
+                            return
+                        }
+                        buttonRow.clearAllChecks()
+                        checked = true
+                        mainWindow.showPayload()
+                    }
+                }
+
                 Item {
                     Layout.fillHeight:  true
                     width:              ScreenTools.defaultFontPixelWidth / 2

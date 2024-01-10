@@ -130,7 +130,7 @@ find_package(Qt5 ${QT_VERSION}
 		Svg
 		Test
 		TextToSpeech
-		Widgets
+                Widgets
 		Xml
 	REQUIRED
 	HINTS
@@ -156,6 +156,7 @@ include_directories(
 	libs/mavlink/include/mavlink/v2.0
 	libs/mavlink/include/mavlink/v2.0/ardupilotmega
 	libs/mavlink/include/mavlink/v2.0/common
+	libs/mavlink/include/mavlink/v2.0/seabot
 
 	libs/shapelib
 )

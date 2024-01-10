@@ -1,4 +1,5 @@
 
+find_package(Qt5 COMPONENTS QuickControls2 REQUIRED)
 include_directories(
 	.
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -127,6 +128,7 @@ add_subdirectory(Geo)
 add_subdirectory(GPS)
 add_subdirectory(Joystick)
 add_subdirectory(MissionManager)
+add_subdirectory(PayLoad)
 add_subdirectory(PlanView)
 add_subdirectory(PositionManager)
 add_subdirectory(QmlControls)
@@ -145,6 +147,7 @@ target_link_libraries(qgc
 
 	PUBLIC
 		Qt5::QuickWidgets
+                Qt5::QuickControls2
 		Qt5::Widgets
 
                 ADSB
@@ -163,6 +166,7 @@ target_link_libraries(qgc
 		gps
 		Joystick
 		MissionManager
+		PayloadLib
 		PositionManager
 		QmlControls
 		QtLocationPlugin
