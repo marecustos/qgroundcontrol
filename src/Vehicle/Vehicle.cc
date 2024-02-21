@@ -606,6 +606,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     }
 
     if (message.sysid != _id && message.sysid != 0) {
+        qCDebug(VehicleLog) <<"check sys id "<<message.sysid;
         // We allow RADIO_STATUS messages which come from a link the vehicle is using to pass through and be handled
         if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link))) {
             return;
@@ -753,6 +754,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_PING:
         _handlePing(link, message);
+        break;
+    case MAVLINK_MSG_ID_PAYLOAD_STATUS:
+        _handlePayloadStatus(message);
         break;
     case MAVLINK_MSG_ID_MOUNT_ORIENTATION:
         _handleGimbalOrientation(message);
@@ -1733,6 +1737,16 @@ void Vehicle::setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFi
     }
     _actuators->load(metadataJsonFileName);
 }
+
+void Vehicle::_handlePayloadStatus(mavlink_message_t& message)
+{
+    mavlink_payload_status_t payloadStatus;
+
+    mavlink_msg_payload_status_decode(&message, &payloadStatus);
+
+    emit payloadStatusChanged(payloadStatus);
+}
+
 
 void Vehicle::_handleHeartbeat(mavlink_message_t& message)
 {
