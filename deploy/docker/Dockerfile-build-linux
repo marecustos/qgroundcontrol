@@ -81,4 +81,4 @@ RUN useradd user --create-home --home-dir /home/user --shell /bin/bash --uid 100
 USER user
 
 WORKDIR /project/build
-CMD qmake /project/source && make -j$(nproc)
+CMD cmake /project/source && make -j$(nproc)
