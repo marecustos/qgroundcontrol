@@ -159,6 +159,10 @@ ApplicationWindow {
         showTool(qsTr("Analyze Tools"), "AnalyzeView.qml", "/qmlimages/Analyze.svg")
     }
 
+    function showPayloadTool() {
+        showTool(qsTr("Payload"), "Payload.qml", "/qmlimages/robotic_arm.svg")
+    }
+
     function showSetupTool() {
         showTool(qsTr("Vehicle Setup"), "SetupView.qml", "/qmlimages/Gears.svg")
     }
@@ -308,6 +312,21 @@ ApplicationWindow {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
                                 mainWindow.showSetupTool()
+                            }
+                        }
+                    }
+
+                    SubMenuButton {
+                        id:                 payloadButton
+                        height:             toolSelectDialog._toolButtonHeight
+                        Layout.fillWidth:   true
+                        text:               qsTr("Payload")
+                        imageColor:         qgcPal.text
+                        imageResource:      "/qmlimages/robotic_arm.svg"
+                        onClicked: {
+                            if (!mainWindow.preventViewSwitch()) {
+                                toolSelectDialog.close()
+                                mainWindow.showPayloadTool()
                             }
                         }
                     }
