@@ -1,0 +1,17 @@
+name: ubuntu-20.04-workflow
+
+on:
+  pull_request:
+    branches:
+      - Seabot_Stable_V4.3
+
+jobs:
+  test_ubuntu_20_04:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: seabotxcompanion build
+        run: bash ./deploy/docker/build.sh
