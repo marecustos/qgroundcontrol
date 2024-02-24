@@ -1,0 +1,17 @@
+name: ubuntu-latest-workflow
+
+on:
+  pull_request:
+    branches:
+      - Seabot_Stable_V4.3
+
+jobs:
+  test_debian_11:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: seabotxcompanion build
+        run: bash ./deploy/docker/build.sh
