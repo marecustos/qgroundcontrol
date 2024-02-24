@@ -78,7 +78,7 @@ jobs:
       - name: Build
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run:  |
-              cmake -r ${SOURCE_DIR}
+              cmake  ${SOURCE_DIR}
               make -j2
 
       - name: ccache post-run
