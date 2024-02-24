@@ -1,20 +1,9 @@
 name: Linux Release
 
 on:
-  push:
-    branches:
-      - 'Seabot_Stable_V4.3'
-    tags:
-      - 'v*'
-    paths-ignore:
-      - 'docs/**'
-      - '.github/workflows/**'
   pull_request:
     branches:
-    - '*'
-    paths-ignore:
-      - 'docs/**'
-      - '.github/workflows/**'
+      - Seabot_Stable_V4.3
 
 defaults:
   run:
