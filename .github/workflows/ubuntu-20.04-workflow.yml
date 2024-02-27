@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - Seabot_Stable_V4.3
+  push:
+    branches:
+      - Seabot_Stable_V4.3
 
 defaults:
   run:
