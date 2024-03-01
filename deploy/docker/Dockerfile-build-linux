@@ -20,6 +20,8 @@ ENV QT_PATH /opt/Qt
 ENV QT_DESKTOP $QT_PATH/${QT_VERSION}/gcc_64
 
 ENV PATH /usr/lib/ccache:$QT_DESKTOP/bin:$PATH
+RUN apt-get update && apt-get -y install  libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6
+# libxss1 libasound2 libatk-bridge2.0-0 libatspi2.0-0  libvpx5 libevent-2.1-6 libicu60 -y
 
 RUN apt-get update && apt-get -y --quiet --no-install-recommends install \
 		apt-utils \

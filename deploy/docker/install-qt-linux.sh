@@ -7,6 +7,8 @@ QT_HOST="${QT_HOST:-linux}"
 QT_TARGET="${QT_TARGET:-desktop}"
 #QT_MODULES="${QT_MODULES:-qtcharts}"
 QT_MODULES="${QT_MODULES:-qtcharts qtwebengine}"  # Added qtwebengine module
+
+
 # Exit immediately if a command exits with a non-zero status
 set -e
 
