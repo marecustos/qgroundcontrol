@@ -13,7 +13,7 @@ QT_MODULES="${QT_MODULES:-qtcharts qtwebengine}"  # Added qtwebengine module
 set -e
 
 apt-get update
-apt-get install libnss3 python3 python3-pip -y
+apt-get install python3 python3-pip -y
 pip3 install aqtinstall
 aqt install-qt ${QT_HOST} ${QT_TARGET} ${QT_VERSION} -O ${QT_PATH} -m ${QT_MODULES}
 echo "Remember to export the following to your PATH: ${QT_PATH}/${QT_VERSION}/*/bin"
