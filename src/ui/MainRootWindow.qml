@@ -163,6 +163,10 @@ ApplicationWindow {
         showTool(qsTr("Payload"), "Payload.qml", "/qmlimages/robotic_arm.svg")
     }
 
+    function showOlympiosTool() {
+        showTool(qsTr("Olympios Sensor"), "olympios.qml", "/qmlimages/olympios_icon.svg")
+    }
+
     function showSetupTool() {
         showTool(qsTr("Vehicle Setup"), "SetupView.qml", "/qmlimages/Gears.svg")
     }
@@ -327,6 +331,21 @@ ApplicationWindow {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
                                 mainWindow.showPayloadTool()
+                            }
+                        }
+                    }
+
+                    SubMenuButton {
+                        id:                 olympiosButton
+                        height:             toolSelectDialog._toolButtonHeight
+                        Layout.fillWidth:   true
+                        text:               qsTr("Olympios Sensor")
+                        imageColor:         qgcPal.text
+                        imageResource:      "/qmlimages/olympios_icon.svg"
+                        onClicked: {
+                            if (!mainWindow.preventViewSwitch()) {
+                                toolSelectDialog.close()
+                                mainWindow.showOlympiosTool()
                             }
                         }
                     }
