@@ -24,130 +24,236 @@ Rectangle {
         width:              setupViewPayload.width
         spacing:            ScreenTools.defaultFontPixelHeight * 0.5
         anchors.margins:    ScreenTools.defaultFontPixelWidth
+
+        //-- Payload Control
+                Item {
+                    id:                         payloadControlLabel
+                    width:                      setupViewPayload.width * 0.8
+                    height:                     controlLabel.height
+                    anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                    anchors.horizontalCenter:   parent.horizontalCenter
+                    visible:                    true
+                    QGCLabel {
+                        id:             controlLabel
+                        text:           qsTr("PayLoad Control")
+                        font.family:    ScreenTools.demiboldFontFamily
+                    }
+                }
+
+
         Rectangle {
             id : keyboardControlSpace
+            height:         controlKeysColoumn.height + (ScreenTools.defaultFontPixelHeight * 2)
+            width:          setupViewPayload.width * 0.8
+            color:          qgcPal.windowShade
+            anchors.margins: ScreenTools.defaultFontPixelWidth
             anchors.horizontalCenter: parent.horizontalCenter
-            color: "transparent"
             focus: true // Ensure this item can receive focus
-            height : 300
-            width: setupViewPayload.width
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    keyboardControlSpace.forceActiveFocus()
-                }
-            }
-
-            Keys.onPressed: {
-                console.log("Key pressed:", event.key)
-                var keyNumber = parseInt(event.key)
-                if (!isNaN(keyNumber)) {
-                    // Use keyNumber as an integer
-                    payload_controller.sendKeyboardCommand(keyNumber)
-                    if (event.key === Qt.Key_Up) up_arrow.color = qgcPal.windowShade
-                    if (event.key === Qt.Key_Down) down_arrow.color = qgcPal.windowShade
-                    if (event.key === Qt.Key_Right) right_arrow.color = qgcPal.windowShade
-                    if (event.key === Qt.Key_Left) left_arrow.color = qgcPal.windowShade
-                    if (event.key === Qt.Key_Space) space_button.color = qgcPal.windowShade
-
-                } else {
-                    console.log("Invalid key number:", event.key)
-                }
-            }
-            Keys.onReleased: {
-                if (event.key === Qt.Key_Up) up_arrow.color = "lightgrey";
-                if (event.key === Qt.Key_Down) down_arrow.color = "lightgrey";
-                if (event.key === Qt.Key_Right) right_arrow.color = "lightgrey";
-                if (event.key === Qt.Key_Left) left_arrow.color = "lightgrey";
-                if (event.key === Qt.Key_Space) space_button.color = "lightgrey";
-            }
             Column {
-                spacing: 10
-                anchors.centerIn: parent                
-                // Up arrow button
+                anchors.centerIn: parent
+                id : controlKeysColoumn     
+                spacing:    _columnSpacing 
+
+                // Rows with labels, buttons, and values
                 Row {
-                    spacing: 10
-                    Rectangle {
-                        width: 50
-                        height: 50
-                        color: "transparent"
-                        border.color: "transparent"
-                        border.width: 1
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Y Rotation                                ")
                     }
-                    Rectangle {
-                        id: up_arrow
-                        width: 50
-                        height: 50
-                        color: "lightgrey"
-                        border.color: "black"
-                        border.width: 1
-                        Text {
-                            anchors.centerIn: parent
-                            text: "↑"
+                    ControlButton {
+                        targetCommand: "Y Rotation"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
                         }
+
+                    }
+                    ControlButton {
+                        targetCommand: "Y Rotation"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                }     
+
+                Row {
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Docking                                    ")
+                    }
+                    ControlButton {
+                        targetCommand: "docking"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                    ControlButton {
+                        targetCommand: "docking"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                }  
+
+                Row {
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("probXTransition                     ")
+                    }
+                    ControlButton {
+                        targetCommand: "probXTransition"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                    ControlButton {
+                        targetCommand: "probXTransition"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                }  
+
+                Row {
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("probYTransition                     ")
+                    }
+                    ControlButton {
+                        targetCommand: "probYTransition"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                    ControlButton {
+                        targetCommand: "probYTransition"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                }  
+
+                Row {
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("probZTransition                     ")
+                    }
+                    ControlButton {
+                        targetCommand: "probZTransition"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                    ControlButton {
+                        targetCommand: "probZTransition"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                }  
+
+                Row {
+                    spacing:    ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("deploymentTransition          ")
+                    }
+                    ControlButton {
+                        targetCommand: "deploymentTrans"
+                        valueCommand: +1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
+                    }
+                    ControlButton {
+                        targetCommand: "deploymentTrans"
+                        valueCommand: -1
+                        onControlButtonPressed: {
+                            payload_controller.sendControlCommand(targetCommand,valueCommand)
+                        }
+
                     }
                 }
 
-                // Left and Right arrow buttons
                 Row {
-                    spacing: 10
-                    Rectangle {
-                        id: left_arrow
-                        width: 50
-                        height: 50
-                        color: "lightgrey"
-                        border.color: "black"
-                        border.width: 1
-                        Text {
-                            anchors.centerIn: parent
-                            text: "←"
-                        }
-                    }
-                    Rectangle {
-                        id: down_arrow
-                        width: 50
-                        height: 50
-                        color: "lightgrey"
-                        border.color: "black"
-                        border.width: 1
-                        Text {
-                            anchors.centerIn: parent
-                            text: "↓"
-                        }
-                    }
-                    Rectangle {
-                        id: right_arrow
-                        width: 50
-                        height: 50
-                        color: "lightgrey"
-                        border.color: "black"
-                        border.width: 1
-                        Text {
-                            anchors.centerIn: parent
-                            text: "→"
-                        }
-                    }
-                }
+                    spacing: ScreenTools.defaultFontPixelWidth
 
-                // Space button
-                Rectangle {
-                    id: space_button
-                    width: 170
-                    height: 50
-                    color: "lightgrey"
-                    border.color: "black"
-                    border.width: 1
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Space"
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text:  qsTr("Magnet                                         ")
                     }
-                }
+
+                    Switch {
+                        id: magnetSwitch
+                        onClicked: {
+                            if (!checked) {
+                                payload_controller.sendControlCommand("Magnet",0)
+                            }
+                            else {
+                                payload_controller.sendControlCommand("Magnet",1)
+                            }
+                        }
+                    }
+                } 
+
+
+                Row {
+                    spacing: ScreenTools.defaultFontPixelWidth
+
+                    QGCLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text:  qsTr("Gripper                                         ")
+                    }
+
+                    Switch {
+                        id: gripperSwitch
+                        onClicked: {
+                            if (!checked) {
+                                payload_controller.sendControlCommand("Gripper",0)
+                            }
+                            else {
+                                payload_controller.sendControlCommand("Gripper",1)
+                            }
+                        }
+                    }
+                } 
+
+                
             }
         }
         Component.onCompleted: {
             keyboardControlSpace.forceActiveFocus()
-            console.log("Rectangle completed")
             payload_controller.debug()
         }
 

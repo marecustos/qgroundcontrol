@@ -5,9 +5,11 @@
 #include "QGCLoggingCategory.h"
 #include <QVariantMap>
 #include "QGCMAVLink.h"
+#include "QGCToolbox.h"
 
 class  MultiVehicleManager;
 class  Vehicle;
+class LinkInterface;
 
 Q_DECLARE_LOGGING_CATEGORY(PayloadControllerLog)
 
@@ -21,8 +23,9 @@ public:
 
     PayloadController(void);
     Q_INVOKABLE void debug(void);
-    Q_INVOKABLE void sendKeyboardCommand(int);
+    Q_INVOKABLE void sendControlCommand(const QString& target , int value);
     QVariantMap payloadStatus() const;
+    bool sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message);
 private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
     void handlePayloadStatusChanged(const mavlink_payload_status_t &payloadStatus);
@@ -33,6 +36,8 @@ signals:
 private:
     Vehicle* _vehicle;
     QVariantMap m_payloadStatus;
+    QGCToolbox* _toolbox = nullptr;
+    LinkManager*  _link_manager = nullptr;
 
 };
 
