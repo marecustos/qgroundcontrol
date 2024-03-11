@@ -145,6 +145,7 @@ Rectangle {
                                     editingConfig.link.disconnect()
                                     editingConfig.linkChanged()
                                     editingConfig = QGroundControl.linkManager.startConfigurationEditingPayload()
+                                    linksettingsLoader.subEditConfig = editingConfig
                                 }
                             }
                     }
