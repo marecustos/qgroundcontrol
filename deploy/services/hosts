@@ -1,0 +1,8 @@
+127.0.0.1	localhost
+127.0.1.1	companion_computer
+
+#static ip addresses  
+10.42.0.1   base_station.local
+10.42.0.14  companion_computer.local
+
+#This file should be in /etc/ of the basestation and companion computer

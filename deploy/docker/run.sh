@@ -3,10 +3,10 @@
 
 xhost +
 docker run \
+    --privileged \
     --rm \
     -it \
-    --privileged \
-    --network host \
+    --network=host \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v ${PWD}/build:/project/build \
