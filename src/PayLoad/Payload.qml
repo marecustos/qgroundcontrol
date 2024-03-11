@@ -381,6 +381,7 @@ Rectangle {
                 Component.onCompleted: {
                     keyboardControlSpace.forceActiveFocus()
                     payload_controller.debug()
+                    if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig
                     console.log(QGroundControl.linkManager.linkConfigurations.count)
                     console.log(QGroundControl.linkManager.payloadConfigExist())
                 }
