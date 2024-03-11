@@ -108,6 +108,12 @@ void LinkManager::createConnectedLink(LinkConfiguration* config)
     }
 }
 
+LinkConfiguration* LinkManager::createConnectedLinkPayload()
+{
+    createConnectedLink(_rgPayloadLinkConfig);
+    return _rgPayloadLinkConfig.get();
+}
+
 bool LinkManager::createConnectedLink(SharedLinkConfigurationPtr& config, bool isPX4Flow)
 {
     SharedLinkInterfacePtr link = nullptr;
@@ -183,6 +189,16 @@ SharedLinkInterfacePtr LinkManager::mavlinkForwardingLink()
     }
 
     return nullptr;
+}
+
+LinkInterface* LinkManager::payloadLink()
+{
+    return (_rgPayloadLinkConfig->link());
+}
+
+LinkConfiguration* LinkManager::getPayloadConfig()
+{
+    return _rgPayloadLinkConfig.get();
 }
 
 SharedLinkInterfacePtr LinkManager::mavlinkForwardingSupportLink()
@@ -280,6 +296,8 @@ void LinkManager::saveLinkConfigurationList()
                 settings.setValue(root + "/type", linkConfig->type());
                 settings.setValue(root + "/auto", linkConfig->isAutoConnect());
                 settings.setValue(root + "/high_latency", linkConfig->isHighLatency());
+                if(linkConfig.get() == _rgPayloadLinkConfig.get())settings.setValue(root + "/payload", true);
+                else settings.setValue(root + "/payload", false);
                 // Have the instance save its own values
                 linkConfig->saveSettings(settings, root);
             }
@@ -310,6 +328,7 @@ void LinkManager::loadLinkConfigurationList()
                             LinkConfiguration* link = nullptr;
                             bool autoConnect = settings.value(root + "/auto").toBool();
                             bool highLatency = settings.value(root + "/high_latency").toBool();
+                            bool isPayloadLink = settings.value(root + "/payload").toBool();
 
                             switch(type) {
 #ifndef NO_SERIAL_LINK
@@ -344,7 +363,8 @@ void LinkManager::loadLinkConfigurationList()
                                 link->setAutoConnect(autoConnect);
                                 link->setHighLatency(highLatency);
                                 link->loadSettings(settings, root);
-                                addConfiguration(link);
+                                if(isPayloadLink) _rgPayloadLinkConfig = addConfiguration(link);
+                                else addConfiguration(link);
                             }
                         } else {
                             qWarning() << "Link Configuration" << root << "has an empty name." ;
@@ -751,6 +771,16 @@ QStringList LinkManager::serialBaudRates(void)
 #endif
 }
 
+bool LinkManager::payloadConfigExist()
+{
+    qCDebug(LinkManagerLog) << "payload config " << _rgPayloadLinkConfig.get();
+    if (_rgPayloadLinkConfig) {
+        qCDebug(LinkManagerLog) << "payload config exist " << _rgPayloadLinkConfig.get();
+        return true;
+    }
+    return false;
+}
+
 bool LinkManager::endConfigurationEditing(LinkConfiguration* config, LinkConfiguration* editedConfig)
 {
     if (config && editedConfig) {
@@ -765,10 +795,36 @@ bool LinkManager::endConfigurationEditing(LinkConfiguration* config, LinkConfigu
     return true;
 }
 
+bool LinkManager::endConfigurationEditingPayload(LinkConfiguration* editedConfig)
+{
+    qCDebug(LinkManagerLog) << editedConfig->name();
+    if (_rgPayloadLinkConfig.get() && editedConfig) {
+        _rgPayloadLinkConfig.get()->copyFrom(editedConfig);
+        saveLinkConfigurationList();
+        emit _rgPayloadLinkConfig.get()->nameChanged(_rgPayloadLinkConfig.get()->name());
+        // Discard temporary duplicate
+        //delete editedConfig;
+    } else {
+        qWarning() << "Internal error";
+    }
+    return true;
+}
+
 bool LinkManager::endCreateConfiguration(LinkConfiguration* config)
 {
     if (config) {
         addConfiguration(config);
+        saveLinkConfigurationList();
+    } else {
+        qWarning() << "Internal error";
+    }
+    return true;
+}
+
+bool LinkManager::endCreateConfigurationPayload(LinkConfiguration* config)
+{
+    if (config) {
+        _rgPayloadLinkConfig = addConfiguration(config);
         saveLinkConfigurationList();
     } else {
         qWarning() << "Internal error";
@@ -788,6 +844,22 @@ LinkConfiguration* LinkManager::createConfiguration(int type, const QString& nam
 
 LinkConfiguration* LinkManager::startConfigurationEditing(LinkConfiguration* config)
 {
+    if (config) {
+#ifndef NO_SERIAL_LINK
+        if (config->type() == LinkConfiguration::TypeSerial) {
+            _updateSerialPorts();
+        }
+#endif
+        return LinkConfiguration::duplicateSettings(config);
+    } else {
+        qWarning() << "Internal error";
+        return nullptr;
+    }
+}
+
+LinkConfiguration* LinkManager::startConfigurationEditingPayload()
+{
+    LinkConfiguration* config = _rgPayloadLinkConfig.get();
     if (config) {
 #ifndef NO_SERIAL_LINK
         if (config->type() == LinkConfiguration::TypeSerial) {
@@ -830,6 +902,7 @@ void LinkManager::_removeConfiguration(LinkConfiguration* config)
     for (int i=0; i<_rgLinkConfigs.count(); i++) {
         if (_rgLinkConfigs[i].get() == config) {
             _rgLinkConfigs.removeAt(i);
+            if(_rgPayloadLinkConfig.get() == config)_rgPayloadLinkConfig = nullptr;
             return;
         }
     }

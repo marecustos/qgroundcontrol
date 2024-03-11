@@ -43,34 +43,23 @@ bool PayloadController::sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, 
 }
 void PayloadController::sendControlCommand(const QString& target ,int value)
 {
-    SharedLinkInterfacePtr sharedLink;
-    bool exist = false;
-    for (const auto& link : _link_manager->links()) {
-        if(link->linkConfiguration()->name() == "Payload") {
-            exist = true;
-            sharedLink = link ;
-        }
+    QByteArray ba = target.toLocal8Bit();
+    const char *targetCommand = ba.data();
+    if (!_link_manager->payloadLink()) {
+        qCDebug(PayloadControllerLog) << "send keyboard: primary link gone!";
+        return;
     }
-    qCDebug(PayloadControllerLog) <<"exist ? "<<exist;
-    if ( exist ) {
-        QByteArray ba = target.toLocal8Bit();
-        const char *targetCommand = ba.data();
-        //qCDebug(PayloadControllerLog) <<"shared link ? "<<sharedLink->linkConfiguration()->name();
-        if (!sharedLink) {
-            qCDebug(PayloadControllerLog) << "send keyboard: primary link gone!";
-            return;
-        }
-        mavlink_message_t msg;
-        mavlink_msg_custom_payload_control_pack(
-            qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-            qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-            &msg,
-            targetCommand,
-            value
-        );
-        this->sendPayloadMessageOnLinkThreadSafe(sharedLink.get(), msg);
-        qCDebug(PayloadControllerLog) << "command sent msg"<<msg.msgid;
-    }
+    qCDebug(PayloadControllerLog) << "trying to send ...";
+    mavlink_message_t msg;
+    mavlink_msg_custom_payload_control_pack(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        &msg,
+        targetCommand,
+        value
+    );
+    this->sendPayloadMessageOnLinkThreadSafe(_link_manager->payloadLink(), msg);
+    qCDebug(PayloadControllerLog) << "command sent msg"<<msg.msgid;
 }
 
 QVariantMap PayloadController::payloadStatus() const

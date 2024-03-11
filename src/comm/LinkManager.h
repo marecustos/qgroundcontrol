@@ -61,11 +61,15 @@ public:
     Q_PROPERTY(bool                 mavlinkSupportForwardingEnabled READ mavlinkSupportForwardingEnabled NOTIFY mavlinkSupportForwardingEnabledChanged)
 
     /// Create/Edit Link Configuration
+    Q_INVOKABLE bool  payloadConfigExist                ();
     Q_INVOKABLE LinkConfiguration*  createConfiguration                (int type, const QString& name);
     Q_INVOKABLE LinkConfiguration*  startConfigurationEditing          (LinkConfiguration* config);
+    Q_INVOKABLE LinkConfiguration*  startConfigurationEditingPayload   ();
     Q_INVOKABLE void                cancelConfigurationEditing         (LinkConfiguration* config) { delete config; }
     Q_INVOKABLE bool                endConfigurationEditing            (LinkConfiguration* config, LinkConfiguration* editedConfig);
+    Q_INVOKABLE bool                endConfigurationEditingPayload            (LinkConfiguration* editedConfig);
     Q_INVOKABLE bool                endCreateConfiguration             (LinkConfiguration* config);
+    Q_INVOKABLE bool                endCreateConfigurationPayload             (LinkConfiguration* config);
     Q_INVOKABLE void                removeConfiguration                (LinkConfiguration* config);
     Q_INVOKABLE void                createMavlinkForwardingSupportLink (void);
 
@@ -103,12 +107,16 @@ public:
 
     // This should only be used by Qml code
     Q_INVOKABLE void createConnectedLink(LinkConfiguration* config);
+    Q_INVOKABLE LinkConfiguration* createConnectedLinkPayload();
 
     /// Returns pointer to the mavlink forwarding link, or nullptr if it does not exist
     SharedLinkInterfacePtr mavlinkForwardingLink();
 
     /// Returns pointer to the mavlink support forwarding link, or nullptr if it does not exist
     SharedLinkInterfacePtr mavlinkForwardingSupportLink();
+
+    LinkInterface*  payloadLink();
+    Q_INVOKABLE LinkConfiguration*  getPayloadConfig();
 
     void disconnectAll(void);
 
@@ -175,6 +183,7 @@ private:
 
     QList<SharedLinkInterfacePtr>       _rgLinks;
     QList<SharedLinkConfigurationPtr>   _rgLinkConfigs;
+    SharedLinkConfigurationPtr          _rgPayloadLinkConfig;
     QString                             _autoConnectRTKPort;
     QmlObjectListModel                  _qmlConfigurations;
 
