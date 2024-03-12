@@ -193,6 +193,7 @@ SharedLinkInterfacePtr LinkManager::mavlinkForwardingLink()
 
 LinkInterface* LinkManager::payloadLink()
 {
+    if (_rgPayloadLinkConfig == nullptr) return nullptr;
     return (_rgPayloadLinkConfig->link());
 }
 
