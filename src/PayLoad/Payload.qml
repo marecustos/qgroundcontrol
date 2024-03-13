@@ -385,6 +385,9 @@ Rectangle {
                     console.log(QGroundControl.linkManager.linkConfigurations.count)
                     console.log(QGroundControl.linkManager.payloadConfigExist())
                 }
+                Component.onDestruction: {
+                    if (!editingConfig.link) QGroundControl.linkManager.cancelConfigurationEditing(editingConfig)
+                }
 
                 //-- Payload Status
                         Item {
