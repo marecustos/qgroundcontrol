@@ -10,7 +10,7 @@ User=seabot
 Group=seabot
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/seabot/.Xauthority
-WorkingDirectory=/home/seabot/seabot_qgc/
+WorkingDirectory=/home/seabot_qgc/
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=seabot_qgc
