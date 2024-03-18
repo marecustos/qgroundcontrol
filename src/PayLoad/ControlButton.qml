@@ -42,6 +42,7 @@ Button {
             color: "black" // Set the text color
         }
         MouseArea {
+            id: mouseAreaZone
             anchors.fill: parent
             onPressed: {
                 // Start the timer when the mouse area is pressed
@@ -57,6 +58,18 @@ Button {
             }
         }
     }   
+    onJoystickClicked: {
+        //console.log("Button state:", buttonState)
+        if (buttonState){
+            customButtonRectangle.color = qgcPal.colorGrey
+            clickTimer.restart()
+        }
+        else{
+            customButtonRectangle.color ="transparent"
+            clickTimer.stop()
+        }
+    }
     // Define the custom signals
     signal controlButtonPressed(string targetCommand, int valueCommand)
+    signal joystickClicked(int buttonState)
 }
