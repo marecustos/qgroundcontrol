@@ -3,13 +3,14 @@ Description= Seabot QGroundControl Service
 After=network.target
 
 [Service]
-ExecStart=/home/qgroundcontrol-Seabot_Stable_V4.3/QGroundControl
+ExecStart=/home/seabot_qgc/QGroundControl
 Restart=always
+RestartSec=5
 User=seabot
 Group=seabot
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/seabot/.Xauthority
-WorkingDirectory=/home/seabot/qgroundcontrol-Seabot_Stable_V4.3/
+WorkingDirectory=/home/seabot/seabot_qgc/
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=seabot_qgc

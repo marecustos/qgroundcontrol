@@ -21,14 +21,17 @@ echo "Remember to export the following to your PATH: ${QT_PATH}/${QT_VERSION}/*/
 echo "export PATH=$(readlink -e ${QT_PATH}/${QT_VERSION}/*/bin/):PATH"
 echo "Deploying systemd service "
 
-    sudo cp hosts /etc/
-    sudo cp seabot_qgc.service /etc/systemd/system
-    sudo systemctl daemon-reload
-    sudo systemctl enable seabot_qgc.service
-    sudo systemctl start seabot_qgc.service
-    sudo systemctl status seabot_qgc.service
-
-
-
-
+#Installing extra mandatory dependencies and removing conflicts
+    echo "Installing extra mandatory dependencies and removing conflicts"
+    usermod -a -G dialout $USER
+    apt-get remove modemmanager -y
+    apt install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y
+    apt install libfuse2 -y
+    apt install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor0 -y
+    
+#Deploying systemd service 
+    systemctl daemon-reload
+    systemctl enable seabot_qgc.service
+    systemctl start seabot_qgc.service
+    systemctl status seabot_qgc.service
 echo "seabot_qgc debian package is installed successfully"
