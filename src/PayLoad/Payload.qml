@@ -25,7 +25,7 @@ Rectangle {
     property var editingConfig : QGroundControl.linkManager.payloadConfigExist()? QGroundControl.linkManager.startConfigurationEditingPayload() :  QGroundControl.linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
     property var  _activeJoystick:          joystickManager.activeJoystick
     property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB}
-
+    property var switches : {9:magnetSwitch , 10 : gripperSwitch}
     PayloadController {
         id: payload_controller
     }
@@ -193,7 +193,11 @@ Rectangle {
                         target:     _activeJoystick
                         onRawButtonPressedChanged: {
                             //console.log("button "+index+" preesed"+pressed)
-                            buttonMap[index].joystickClicked(pressed)
+                            if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
+                            else if(switches.hasOwnProperty(index) && pressed){
+                                switches[index].checked = !switches[index].checked
+                                switches[index].clicked()
+                                }
                         }
                     }
 
