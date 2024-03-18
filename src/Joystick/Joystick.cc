@@ -98,7 +98,7 @@ AssignableButtonAction::AssignableButtonAction(QObject* parent, QString action_,
     , _repeat(canRepeat_)
 {
 }
-
+bool Joystick::_inPayloadPage = false;
 Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatCount, MultiVehicleManager* multiVehicleManager)
     : _name(name)
     , _axisCount(axisCount)
@@ -127,6 +127,17 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     connect(qgcApp()->toolbox()->multiVehicleManager()->vehicles(), &QmlObjectListModel::countChanged, this, &Joystick::_vehicleCountChanged);
 
     _customMavCommands = JoystickMavCommand::load("JoystickMavCommands.json");
+}
+
+bool Joystick::inPayloadPage() {
+    return Joystick::_inPayloadPage;
+}
+
+void Joystick::setInPayloadPage(bool value) {
+    if (Joystick::_inPayloadPage != value) {
+        Joystick::_inPayloadPage = value;
+        emit inPayloadPageChanged();
+    }
 }
 
 void Joystick::stop()
@@ -1005,7 +1016,7 @@ void Joystick::setCalibrationMode(bool calibrating)
 
 void Joystick::_executeButtonAction(const QString& action, bool buttonDown)
 {
-    if (!_activeVehicle || !_activeVehicle->joystickEnabled() || action == _buttonActionNone) {
+    if (!_activeVehicle || !_activeVehicle->joystickEnabled() || action == _buttonActionNone || this->inPayloadPage()) {
         return;
     }
     if (action == _buttonActionArm) {
