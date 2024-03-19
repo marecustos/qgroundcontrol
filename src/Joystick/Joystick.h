@@ -93,6 +93,7 @@ public:
     Q_PROPERTY(int      totalButtonCount        READ totalButtonCount       CONSTANT)
     Q_PROPERTY(int      axisCount               READ axisCount              CONSTANT)
     Q_PROPERTY(bool     requiresCalibration     READ requiresCalibration    CONSTANT)
+    Q_PROPERTY(bool     inPayloadPage           READ inPayloadPage    NOTIFY inPayloadPageChanged )
 
     //-- Actions assigned to buttons
     Q_PROPERTY(QStringList buttonActions        READ buttonActions          NOTIFY buttonActionsChanged)
@@ -149,6 +150,9 @@ public:
     virtual void setIndex(int index) = 0;
 */
 	virtual bool requiresCalibration(void) { return true; }
+
+    bool inPayloadPage();
+    Q_INVOKABLE void setInPayloadPage(bool value);
 
     int   throttleMode      ();
     void  setThrottleMode   (int mode);
@@ -218,6 +222,7 @@ signals:
     void setVtolInFwdFlight         (bool set);
     void setFlightMode              (const QString& flightMode);
     void emergencyStop              ();
+    void inPayloadPageChanged();
     /**
      * @brief Send MAV_CMD_DO_GRIPPER command to the vehicle
      * 
@@ -272,6 +277,7 @@ protected:
     static const float  _defaultButtonFrequencyHz;
 
     uint8_t*_rgButtonValues         = nullptr;
+    uint8_t*payloadButtonValues         = nullptr;
 
     std::atomic<bool> _exitThread{false};    ///< true: signal thread to exit
     bool    _calibrationMode        = false;
@@ -296,6 +302,7 @@ protected:
     int     _hatCount;
     int     _hatButtonCount;
     int     _totalButtonCount;
+    static bool _inPayloadPage;
 
     static int          _transmitterMode;
     int                 _rgFunctionAxis[maxFunction] = {};

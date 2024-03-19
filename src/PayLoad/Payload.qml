@@ -23,9 +23,22 @@ Rectangle {
     property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
     property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
     property var editingConfig : QGroundControl.linkManager.payloadConfigExist()? QGroundControl.linkManager.startConfigurationEditingPayload() :  QGroundControl.linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
-
+    property var  _activeJoystick:          joystickManager.activeJoystick
+    property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB}
+    property var switches : {9:magnetSwitch , 10 : gripperSwitch}
     PayloadController {
         id: payload_controller
+    }
+
+    Component.onCompleted:{
+        console.log("payload loaded")
+        _activeJoystick.setInPayloadPage(true)
+        console.log(_activeJoystick.inPayloadPage)
+    }
+
+    Component.onDestruction: {
+        _activeJoystick.setInPayloadPage(false)
+        console.log(_activeJoystick.inPayloadPage)
     }
 
 
@@ -176,6 +189,18 @@ Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     focus: true // Ensure this item can receive focus
 
+                    Connections {
+                        target:     _activeJoystick
+                        onRawButtonPressedChanged: {
+                            //console.log("button "+index+" preesed"+pressed)
+                            if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
+                            else if(switches.hasOwnProperty(index) && pressed){
+                                switches[index].checked = !switches[index].checked
+                                switches[index].clicked()
+                                }
+                        }
+                    }
+
                     Column {
                         anchors.centerIn: parent
                         id : controlKeysColoumn     
@@ -190,6 +215,7 @@ Rectangle {
                                 text: qsTr("Y Rotation                                ")
                             }
                             ControlButton {
+                                id : yRotationF
                                 targetCommand: "Y Rotation"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -198,6 +224,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : yRotationB
                                 targetCommand: "Y Rotation"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -215,6 +242,7 @@ Rectangle {
                                 text: qsTr("Docking                                    ")
                             }
                             ControlButton {
+                                id : dockingF
                                 targetCommand: "docking"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -223,6 +251,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : dockingB
                                 targetCommand: "docking"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -240,6 +269,7 @@ Rectangle {
                                 text: qsTr("probXTransition                     ")
                             }
                             ControlButton {
+                                id : probXTransitionF
                                 targetCommand: "probXTransition"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -248,6 +278,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : probXTransitionB
                                 targetCommand: "probXTransition"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -265,6 +296,7 @@ Rectangle {
                                 text: qsTr("probYTransition                     ")
                             }
                             ControlButton {
+                                id : probYTransitionF
                                 targetCommand: "probYTransition"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -273,6 +305,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : probYTransitionB
                                 targetCommand: "probYTransition"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -290,6 +323,7 @@ Rectangle {
                                 text: qsTr("probZTransition                     ")
                             }
                             ControlButton {
+                                id : probZTransitionF
                                 targetCommand: "probZTransition"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -298,6 +332,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : probZTransitionB
                                 targetCommand: "probZTransition"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -315,6 +350,7 @@ Rectangle {
                                 text: qsTr("deploymentTransition          ")
                             }
                             ControlButton {
+                                id : deploymentTransF
                                 targetCommand: "deploymentTrans"
                                 valueCommand: +1
                                 onControlButtonPressed: {
@@ -323,6 +359,7 @@ Rectangle {
 
                             }
                             ControlButton {
+                                id : deploymentTransB
                                 targetCommand: "deploymentTrans"
                                 valueCommand: -1
                                 onControlButtonPressed: {
@@ -384,6 +421,7 @@ Rectangle {
                     if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig
                     console.log(QGroundControl.linkManager.linkConfigurations.count)
                     console.log(QGroundControl.linkManager.payloadConfigExist())
+                    console.log(_activeJoystick)                    
                 }
 
                 //-- Payload Status

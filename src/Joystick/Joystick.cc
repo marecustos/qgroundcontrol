@@ -98,7 +98,7 @@ AssignableButtonAction::AssignableButtonAction(QObject* parent, QString action_,
     , _repeat(canRepeat_)
 {
 }
-
+bool Joystick::_inPayloadPage = false;
 Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatCount, MultiVehicleManager* multiVehicleManager)
     : _name(name)
     , _axisCount(axisCount)
@@ -113,11 +113,14 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     _rgAxisValues   = new int[static_cast<size_t>(_axisCount)];
     _rgCalibration  = new Calibration_t[static_cast<size_t>(_axisCount)];
     _rgButtonValues = new uint8_t[static_cast<size_t>(_totalButtonCount)];
+    payloadButtonValues = new uint8_t[static_cast<size_t>(_totalButtonCount)];
+
     for (int i = 0; i < _axisCount; i++) {
         _rgAxisValues[i] = 0;
     }
     for (int i = 0; i < _totalButtonCount; i++) {
         _rgButtonValues[i] = BUTTON_UP;
+        payloadButtonValues[i] = BUTTON_UP;
         _buttonActionArray.append(nullptr);
     }
     _buildActionList(_multiVehicleManager->activeVehicle());
@@ -127,6 +130,17 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     connect(qgcApp()->toolbox()->multiVehicleManager()->vehicles(), &QmlObjectListModel::countChanged, this, &Joystick::_vehicleCountChanged);
 
     _customMavCommands = JoystickMavCommand::load("JoystickMavCommands.json");
+}
+
+bool Joystick::inPayloadPage() {
+    return Joystick::_inPayloadPage;
+}
+
+void Joystick::setInPayloadPage(bool value) {
+    if (Joystick::_inPayloadPage != value) {
+        Joystick::_inPayloadPage = value;
+        emit inPayloadPageChanged();
+    }
 }
 
 void Joystick::stop()
@@ -143,6 +157,7 @@ Joystick::~Joystick()
     delete[] _rgAxisValues;
     delete[] _rgCalibration;
     delete[] _rgButtonValues;
+    delete[] payloadButtonValues;
     _assignableButtonActions.clearAndDeleteContents();
     for (int button = 0; button < _totalButtonCount; button++) {
         if(_buttonActionArray[button]) {
@@ -515,6 +530,43 @@ void Joystick::run()
 
 void Joystick::_handleButtons()
 {
+    if(this->inPayloadPage()){
+
+        int lastBbuttonValuesPayload[256];
+        //-- Update button states
+        for (int buttonIndex = 0; buttonIndex < _buttonCount; buttonIndex++) {
+            bool newButtonValue = _getButton(buttonIndex);
+            if(buttonIndex < 256)
+                lastBbuttonValuesPayload[buttonIndex] = payloadButtonValues[buttonIndex];
+            if (newButtonValue && payloadButtonValues[buttonIndex] == BUTTON_UP) {
+                payloadButtonValues[buttonIndex] = BUTTON_DOWN;
+                emit rawButtonPressedChanged(buttonIndex, newButtonValue);
+            } else if (!newButtonValue && payloadButtonValues[buttonIndex] != BUTTON_UP) {
+                payloadButtonValues[buttonIndex] = BUTTON_UP;
+                emit rawButtonPressedChanged(buttonIndex, newButtonValue);
+            }
+        }
+        //-- Update hat payload - append hat buttons to the end of the normal payload button list 
+        int numHatButtonsPayload = 4;
+        for (int hatIndex = 0; hatIndex < _hatCount; hatIndex++) {
+            for (int hatButtonIndexPayload = 0; hatButtonIndexPayload<numHatButtonsPayload; hatButtonIndexPayload++) {
+                // Create new index value that includes the normal button list
+                int payloadButtonValueIndex = hatIndex*numHatButtonsPayload + hatButtonIndexPayload + _buttonCount;
+                // Get hat value from joystick
+                bool newButtonValue = _getHat(hatIndex, hatButtonIndexPayload);
+                if(payloadButtonValueIndex < 256)
+                    lastBbuttonValuesPayload[payloadButtonValueIndex] = payloadButtonValues[payloadButtonValueIndex];
+                if (newButtonValue && payloadButtonValues[payloadButtonValueIndex] == BUTTON_UP) {
+                    payloadButtonValues[payloadButtonValueIndex] = BUTTON_DOWN;
+                    emit rawButtonPressedChanged(payloadButtonValueIndex, newButtonValue);
+                } else if (!newButtonValue && payloadButtonValues[payloadButtonValueIndex] != BUTTON_UP) {
+                    payloadButtonValues[payloadButtonValueIndex] = BUTTON_UP;
+                    emit rawButtonPressedChanged(payloadButtonValueIndex, newButtonValue);
+                }
+            }
+        }
+        return;
+    }
     int lastBbuttonValues[256];
     //-- Update button states
     for (int buttonIndex = 0; buttonIndex < _buttonCount; buttonIndex++) {
@@ -1005,7 +1057,7 @@ void Joystick::setCalibrationMode(bool calibrating)
 
 void Joystick::_executeButtonAction(const QString& action, bool buttonDown)
 {
-    if (!_activeVehicle || !_activeVehicle->joystickEnabled() || action == _buttonActionNone) {
+    if (!_activeVehicle || !_activeVehicle->joystickEnabled() || action == _buttonActionNone || this->inPayloadPage()) {
         return;
     }
     if (action == _buttonActionArm) {
