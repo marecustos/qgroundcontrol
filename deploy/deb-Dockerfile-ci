@@ -1,0 +1,30 @@
+# Use Ubuntu 22.04 as the base image
+FROM ubuntu:22.04
+# Switch to the non-root user
+USER root
+# Update package lists and install necessary tools
+RUN apt-get update && apt-get install -y \
+    wget \
+    apt-utils \
+    software-properties-common
+
+# Copy the .deb file to the container (assuming the file is in the same directory as the Dockerfile)
+COPY seabot_qgc.deb /tmp/
+
+# Install the .deb file
+RUN dpkg -i /tmp/seabot_qgc.deb || true && \
+    apt-get install -f -y
+
+# Setup for CI/CD (installing Git and SSH)
+RUN apt-get install -y git openssh-client
+
+# Add a non-root user for running CI/CD processes
+RUN useradd -m ciuser && \
+    usermod -aG sudo ciuser && \
+    echo "ciuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+
+
+
+# Define the entry point for the CI/CD process
+CMD ["/bin/bash"]

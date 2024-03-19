@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 # © 2023 AymeN rachdi     <contact@aymenrachdi.xyz>
 
 
+if [ -e "/opt/QT_installed" ]; then
+    echo "QT already installed"
+else
 # Set default variables
 QT_VERSION="${QT_VERSION:-5.15.2}"
 QT_PATH="${QT_PATH:-/opt/Qt}"
@@ -13,25 +16,29 @@ echo "Installing QT ${QT_VERSION}"
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-apt-get update
-apt-get install python3 python3-pip -y
+
 pip3 install aqtinstall
+#if testing on debian system uncomment bellow
+#pip3 install aqtinstall --break-system
 aqt install-qt ${QT_HOST} ${QT_TARGET} ${QT_VERSION} -O ${QT_PATH} -m ${QT_MODULES}
 echo "Remember to export the following to your PATH: ${QT_PATH}/${QT_VERSION}/*/bin"
 echo "export PATH=$(readlink -e ${QT_PATH}/${QT_VERSION}/*/bin/):PATH"
+echo "${QT_VERSION}" > /opt/QT_installed
 echo "Deploying systemd service "
 
-#Installing extra mandatory dependencies and removing conflicts
-    echo "Installing extra mandatory dependencies and removing conflicts"
-    usermod -a -G dialout $USER
-    apt-get remove modemmanager -y
-    apt install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y
-    apt install libfuse2 -y
-    apt install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor0 -y
-    
+
+
+
+#copying host 
+    cp /etc/hosts /etc/hosts.bak
+    cp /home/hosts /etc
+
 #Deploying systemd service 
-    systemctl daemon-reload
-    systemctl enable seabot_qgc.service
-    systemctl start seabot_qgc.service
-    systemctl status seabot_qgc.service
-echo "seabot_qgc debian package is installed successfully"
+   systemctl daemon-reload
+   systemctl enable seabot_qgc.service
+   systemctl start seabot_qgc.service
+   systemctl status seabot_qgc.service
+   echo "seabot_qgc debian package is installed successfully"
+
+
+fi

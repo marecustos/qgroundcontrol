@@ -1,6 +1,0 @@
-Package: seabot-qgc
-Version: 1.0.0
-Architecture: amd64
-Depends:  espeak, libsdl1.2debian
-Maintainer: Ridha MASTOURI <mastouri.rms@gmail.com>
-Description: Qground control station for Seabot ROBOT
