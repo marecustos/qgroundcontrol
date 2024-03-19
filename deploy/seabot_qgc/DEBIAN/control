@@ -1,0 +1,6 @@
+Package: seabot-qgc
+Version: 1.0.0
+Architecture: amd64
+Depends: python3, python3-pip, gstreamer1.0-plugins-bad, gstreamer1.0-libav, gstreamer1.0-gl, libfuse2, libxcb-xinerama0, libxkbcommon-x11-0, libxcb-cursor0, espeak, libsdl1.2debian
+Maintainer: Ridha MASTOURI <mastouri.rms@gmail.com>
+Description: Qground control station for Seabot ROBOT

@@ -1,3 +1,5 @@
+*.deb
+deploy/package/home/
 .idea/
 .vscode/
 cmake-build-*/
