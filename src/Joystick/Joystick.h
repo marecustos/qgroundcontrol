@@ -277,6 +277,7 @@ protected:
     static const float  _defaultButtonFrequencyHz;
 
     uint8_t*_rgButtonValues         = nullptr;
+    uint8_t*payloadButtonValues         = nullptr;
 
     std::atomic<bool> _exitThread{false};    ///< true: signal thread to exit
     bool    _calibrationMode        = false;
