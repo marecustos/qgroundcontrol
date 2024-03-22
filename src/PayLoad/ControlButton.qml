@@ -62,6 +62,7 @@ Button {
         //console.log("Button state:", buttonState)
         if (buttonState){
             customButtonRectangle.color = qgcPal.colorGrey
+            controlButtonPressed(targetCommand, valueCommand)
             clickTimer.restart()
         }
         else{
