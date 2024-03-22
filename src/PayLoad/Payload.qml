@@ -24,8 +24,8 @@ Rectangle {
     property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
     property var editingConfig : QGroundControl.linkManager.payloadConfigExist()? QGroundControl.linkManager.startConfigurationEditingPayload() :  QGroundControl.linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
     property var  _activeJoystick:          joystickManager.activeJoystick
-    property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB}
-    property var switches : {9:magnetSwitch , 10 : gripperSwitch}
+    property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB , 20 : cameraRotationRelativeB , 19 : cameraRotationRelativeF}
+    property var switches : {9:magnetSwitch , 10 : gripperSwitch , 5: lightSwitch}
     PayloadController {
         id: payload_controller
     }
@@ -192,7 +192,7 @@ Rectangle {
                     Connections {
                         target:     _activeJoystick
                         onRawButtonPressedChanged: {
-                            //console.log("button "+index+" preesed"+pressed)
+                            console.log("button "+index+" preesed"+pressed)
                             if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
                             else if(switches.hasOwnProperty(index) && pressed){
                                 switches[index].checked = !switches[index].checked
@@ -212,11 +212,11 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("Y Rotation                                ")
+                                text: qsTr("Y Rotation                                  ")
                             }
                             ControlButton {
                                 id : yRotationF
-                                targetCommand: "Y Rotation"
+                                targetCommand: "yRotationRelative"
                                 valueCommand: +1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -225,7 +225,7 @@ Rectangle {
                             }
                             ControlButton {
                                 id : yRotationB
-                                targetCommand: "Y Rotation"
+                                targetCommand: "yRotationRelative"
                                 valueCommand: -1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -239,11 +239,11 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("Docking                                    ")
+                                text: qsTr("Docking Rotation                      ")
                             }
                             ControlButton {
                                 id : dockingF
-                                targetCommand: "docking"
+                                targetCommand: "dockingRotationRelative"
                                 valueCommand: +1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -252,7 +252,7 @@ Rectangle {
                             }
                             ControlButton {
                                 id : dockingB
-                                targetCommand: "docking"
+                                targetCommand: "dockingRotationRelative"
                                 valueCommand: -1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -266,7 +266,7 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("probXTransition                     ")
+                                text: qsTr("Prob X Transition                      ")
                             }
                             ControlButton {
                                 id : probXTransitionF
@@ -293,7 +293,7 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("probYTransition                     ")
+                                text: qsTr("Prob Y Transition                      ")
                             }
                             ControlButton {
                                 id : probYTransitionF
@@ -320,7 +320,7 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("probZTransition                     ")
+                                text: qsTr("Prob Z Transition                      ")
                             }
                             ControlButton {
                                 id : probZTransitionF
@@ -347,11 +347,11 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: qsTr("deploymentTransition          ")
+                                text: qsTr("Deployment Transition            ")
                             }
                             ControlButton {
                                 id : deploymentTransF
-                                targetCommand: "deploymentTrans"
+                                targetCommand: "deployTransition"
                                 valueCommand: +1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -360,7 +360,34 @@ Rectangle {
                             }
                             ControlButton {
                                 id : deploymentTransB
-                                targetCommand: "deploymentTrans"
+                                targetCommand: "deployTransition"
+                                valueCommand: -1
+                                onControlButtonPressed: {
+                                    payload_controller.sendControlCommand(targetCommand,valueCommand)
+                                }
+
+                            }
+                        }
+
+                        Row {
+                            spacing:    ScreenTools.defaultFontPixelWidth
+
+                            QGCLabel {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: qsTr("Camera Rotation                       ")
+                            }
+                            ControlButton {
+                                id : cameraRotationRelativeF
+                                targetCommand: "cameraRotationRelative"
+                                valueCommand: +1
+                                onControlButtonPressed: {
+                                    payload_controller.sendControlCommand(targetCommand,valueCommand)
+                                }
+
+                            }
+                            ControlButton {
+                                id : cameraRotationRelativeB
+                                targetCommand: "cameraRotationRelative"
                                 valueCommand: -1
                                 onControlButtonPressed: {
                                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -374,17 +401,17 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text:  qsTr("Magnet                                         ")
+                                text:  qsTr("Magnet                                          ")
                             }
 
                             Switch {
                                 id: magnetSwitch
                                 onClicked: {
                                     if (!checked) {
-                                        payload_controller.sendControlCommand("Magnet",0)
+                                        payload_controller.sendControlCommand("electroMagnet",0)
                                     }
                                     else {
-                                        payload_controller.sendControlCommand("Magnet",1)
+                                        payload_controller.sendControlCommand("electroMagnet",1)
                                     }
                                 }
                             }
@@ -396,17 +423,38 @@ Rectangle {
 
                             QGCLabel {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text:  qsTr("Gripper                                         ")
+                                text:  qsTr("Brush                                             ")
                             }
 
                             Switch {
                                 id: gripperSwitch
                                 onClicked: {
                                     if (!checked) {
-                                        payload_controller.sendControlCommand("Gripper",0)
+                                        payload_controller.sendControlCommand("brushRotation",0)
                                     }
                                     else {
-                                        payload_controller.sendControlCommand("Gripper",1)
+                                        payload_controller.sendControlCommand("brushRotation",1)
+                                    }
+                                }
+                            }
+                        }
+
+                        Row {
+                            spacing: ScreenTools.defaultFontPixelWidth
+
+                            QGCLabel {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text:  qsTr("Light                                               ")
+                            }
+
+                            Switch {
+                                id: lightSwitch
+                                onClicked: {
+                                    if (!checked) {
+                                        payload_controller.sendControlCommand("light",0)
+                                    }
+                                    else {
+                                        payload_controller.sendControlCommand("light",1)
                                     }
                                 }
                             }

@@ -673,6 +673,10 @@ void Joystick::_handleAxis()
         //-- Update axis
         for (int axisIndex = 0; axisIndex < _axisCount; axisIndex++) {
             int newAxisValue = _getAxis(axisIndex);
+            if (axisIndex == 4 || axisIndex == 5){
+                if(int(_rgAxisValues[axisIndex]>25000) != int(newAxisValue > 25000))
+                emit rawButtonPressedChanged(_totalButtonCount+axisIndex , int(newAxisValue > 25000));
+            }
             // Calibration code requires signal to be emitted even if value hasn't changed
             _rgAxisValues[axisIndex] = newAxisValue;
             emit rawAxisValueChanged(axisIndex, newAxisValue);
