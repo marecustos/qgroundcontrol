@@ -26,6 +26,8 @@ Rectangle {
     property var  _activeJoystick:          joystickManager.activeJoystick
     property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB , 20 : cameraRotationRelativeB , 19 : cameraRotationRelativeF}
     property var switches : {9:magnetSwitch , 10 : gripperSwitch , 5: lightSwitch}
+    property var joystickSettingsWindow: null
+
     PayloadController {
         id: payload_controller
     }
@@ -38,7 +40,15 @@ Rectangle {
 
     Component.onDestruction: {
         _activeJoystick.setInPayloadPage(false)
-        console.log(_activeJoystick.inPayloadPage)
+        if (joystickSettingsWindow != null) joystickSettingsWindow.close()
+        console.log("quitting payload")
+    }
+
+    Connections {
+        target: joystickSettingsWindow
+        onClosing: {
+            joystickSettingsWindow = null;
+        }
     }
 
 
@@ -169,15 +179,66 @@ Rectangle {
                         Item {
                             id:                         payloadControlLabel
                             width:                      setupViewPayload.width * 0.8
-                            height:                     controlLabel.height
+                            height:                     controlLabel.height * 3
                             anchors.margins:            ScreenTools.defaultFontPixelWidth*2
                             anchors.horizontalCenter:   parent.horizontalCenter
                             visible:                    true
-                            QGCLabel {
-                                id:             controlLabel
-                                text:           qsTr("PayLoad Control")
-                                font.family:    ScreenTools.demiboldFontFamily
+                            Row {
+                                anchors.fill: parent
+
+                                // Empty space to push the image to the right
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+
+                                // Image on the right side with clickable area
+                                MouseArea {
+                                    width: 35
+                                    height: payloadControlLabel.height
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    onClicked: {
+                                        console.log("joystick setting clicked")
+                                        if (joystickSettingsWindow === null ) {
+                                            var component = Qt.createComponent("PayloadJoystickSettings.qml");
+                                            if (component.status === Component.Ready) {
+                                                joystickSettingsWindow = component.createObject(null);
+                                                if (joystickSettingsWindow !== null) {
+                                                    joystickSettingsWindow.show();
+                                                } else {
+                                                    console.error("Failed to create object from component:", component.errorString());
+                                                }
+                                            } else if (component.status === Component.Error) {
+                                                console.error("Error loading component:", component.errorString());
+                                            } else {
+                                                console.error("Component status:", component.status);
+                                            }
+                                        }
+                                        else {
+                                            joystickSettingsWindow.requestActivate();
+                                        }
+                                    }
+
+                                    Image {
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        source: "/qmlimages/Gears.svg"
+                                        width: 35
+                                        height: payloadControlLabel.height
+                                        fillMode: Image.PreserveAspectFit
+                                    }
+                                }
+
+                                // Label in the middle
+                                QGCLabel {
+                                    id: controlLabel
+                                    text: qsTr("PayLoad Control")
+                                    font.family: ScreenTools.demiboldFontFamily
+                                    verticalAlignment: Text.AlignBottom
+                                    anchors.bottom: parent.bottom
+                                }
                             }
+
                         }
 
                 Rectangle {
@@ -193,11 +254,14 @@ Rectangle {
                         target:     _activeJoystick
                         onRawButtonPressedChanged: {
                             console.log("button "+index+" preesed"+pressed)
-                            if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
-                            else if(switches.hasOwnProperty(index) && pressed){
-                                switches[index].checked = !switches[index].checked
-                                switches[index].clicked()
+                            console.log(joystickSettingsWindow)
+                            if(joystickSettingsWindow == null){
+                                if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
+                                else if(switches.hasOwnProperty(index) && pressed){
+                                    switches[index].checked = !switches[index].checked
+                                    switches[index].clicked()
                                 }
+                            }
                         }
                     }
 
