@@ -209,6 +209,7 @@ ApplicationWindow {
         QGroundControl.linkManager.shutdown()
         QGroundControl.videoManager.stopVideo();
         mainWindow.close()
+        Qt.quit();
     }
 
     // On attempting an application close we check for:
@@ -255,6 +256,7 @@ ApplicationWindow {
 
     onClosing: {
         if (!_forceClose) {
+            mainWindow.raise()
             close.accepted = false
             checkForUnsavedMission()
         }
