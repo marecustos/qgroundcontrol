@@ -294,6 +294,7 @@
         <file alias="PayloadJoystickSettings.qml">src/PayLoad/PayloadJoystickSettings.qml</file>
         <file alias="ControlButton.qml">src/PayLoad/ControlButton.qml</file>
         <file alias="SeabotX.qml">src/PayLoad/SeabotX.qml</file>
+        <file alias="SeabotY.qml">src/PayLoad/SeabotY.qml</file>
         <file alias="PayloadStatus.qml">src/PayLoad/PayloadStatus.qml</file>
         <file alias="client.html">src/ui/toolbar/UtDPU/Client.html</file>
         <file alias="Client.js">src/ui/toolbar/UtDPU/Client.js</file>
