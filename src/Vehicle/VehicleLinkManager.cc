@@ -105,7 +105,7 @@ void VehicleLinkManager::_commLostCheck(void)
 
     bool linkStatusChange = false;
     for (LinkInfo_t& linkInfo: _rgLinkInfo) {
-        if (!linkInfo.commLost && !linkInfo.link->linkConfiguration()->isHighLatency() && linkInfo.heartbeatElapsedTimer.elapsed() > _heartbeatMaxElpasedMSecs) {
+        if (!linkInfo.commLost && !linkInfo.link->linkConfiguration()->isHighLatency() && linkInfo.heartbeatElapsedTimer.elapsed() > _heartbeatMaxElpasedMSecs && !(linkInfo.link.get() == _linkMgr->payloadLink()) ) {
             linkInfo.commLost = true;
             linkStatusChange = true;
 

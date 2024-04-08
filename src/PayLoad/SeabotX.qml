@@ -27,8 +27,7 @@ Rectangle {
     Connections {
         target:     _activeJoystick
         onRawButtonPressedChanged: {
-            console.log("button "+index+" preesed"+pressed)
-            console.log(joystickSettingsWindow)
+            if(!_activeJoystick.inPayloadPage)_activeJoystick.setInPayloadPage(true)
             if(joystickSettingsWindow == null){
                 if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
                 else if(switches.hasOwnProperty(index) && pressed){

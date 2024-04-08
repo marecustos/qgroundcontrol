@@ -33,11 +33,7 @@ Rectangle {
     Component.onCompleted:{
         console.log("payload loaded")
         _activeJoystick.setInPayloadPage(true)
-        console.log(_activeJoystick.inPayloadPage)
-        if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig
-        console.log(QGroundControl.linkManager.linkConfigurations.count)
-        console.log(QGroundControl.linkManager.payloadConfigExist())
-        console.log(_activeJoystick)   
+        if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig  
     }
 
     Component.onDestruction: {
