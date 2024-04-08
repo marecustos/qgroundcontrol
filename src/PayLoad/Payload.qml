@@ -269,25 +269,6 @@ Rectangle {
 
                 
 
-                //-- Payload Status
-                        Item {
-                            id:                         payloadStatusLabel
-                            width:                      setupViewPayload.width * 0.8
-                            height:                     payloadLabel.height
-                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
-                            anchors.horizontalCenter:   parent.horizontalCenter
-                            visible:                    true
-                            QGCLabel {
-                                id:             payloadLabel
-                                text:           qsTr("PayLoad Status")
-                                font.family:    ScreenTools.demiboldFontFamily
-                            }
-                        }
-
-                        PayloadStatus{
-                            
-                        }
-
                 Item { width: 1; height: _margins }
             }
         }

@@ -28,7 +28,7 @@ public:
     bool sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message);
 private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
-    void handlePayloadStatusChanged(const mavlink_payload_status_t &payloadStatus);
+    void handlePayloadStatusChanged(const mavlink_custom_payload_control_t &payloadStatus);
 
 signals:
     void payloadStatusChanged();

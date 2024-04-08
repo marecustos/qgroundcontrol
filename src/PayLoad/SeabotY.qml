@@ -19,6 +19,7 @@ Rectangle {
     focus: true // Ensure this item can receive focus
     property var buttonMap: {"0": yRotationB ,3: yRotationF,20 : cameraRotationRelativeB , 19 : cameraRotationRelativeF}
     property var switches : {9:magnetSwitch}
+    property real status_width:          ScreenTools.defaultFontPixelWidth * 6
 
     Connections {
         target:     _activeJoystick
@@ -66,6 +67,16 @@ Rectangle {
                 }
 
             }
+            QGCTextField {
+                id: yRotationValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.yRotationRelative.toString()
+            }
         }     
 
         Row {
@@ -92,6 +103,16 @@ Rectangle {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
                 }
 
+            }
+            QGCTextField {
+                id: cameraRotValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.cameraRotationRelative.toString()
             }
         }
 

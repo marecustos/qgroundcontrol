@@ -755,7 +755,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_PING:
         _handlePing(link, message);
         break;
-    case MAVLINK_MSG_ID_PAYLOAD_STATUS:
+    case MAVLINK_MSG_ID_CUSTOM_PAYLOAD_CONTROL:
         _handlePayloadStatus(message);
         break;
     case MAVLINK_MSG_ID_MOUNT_ORIENTATION:
@@ -1740,9 +1740,9 @@ void Vehicle::setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFi
 
 void Vehicle::_handlePayloadStatus(mavlink_message_t& message)
 {
-    mavlink_payload_status_t payloadStatus;
+    mavlink_custom_payload_control_t payloadStatus;
 
-    mavlink_msg_payload_status_decode(&message, &payloadStatus);
+    mavlink_msg_custom_payload_control_decode(&message, &payloadStatus);
 
     emit payloadStatusChanged(payloadStatus);
 }
