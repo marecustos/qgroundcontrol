@@ -67,33 +67,11 @@ QVariantMap PayloadController::payloadStatus() const
     return m_payloadStatus;
 }
 
-void PayloadController::handlePayloadStatusChanged(const mavlink_payload_status_t &payloadStatus)
+void PayloadController::handlePayloadStatusChanged(const mavlink_custom_payload_control_t &payloadStatus)
 {
-    qCDebug(PayloadControllerLog) << "recieved payload status";
+    qCDebug(PayloadControllerLog) << "recieved payload status "<< payloadStatus.command_target<< " with value "<<payloadStatus.command_value;
     // Update the QVariantMap with the new payload status
-    m_payloadStatus["pos_x"] = payloadStatus.pos_x;
-    m_payloadStatus["pos_y"] = payloadStatus.pos_y;
-    m_payloadStatus["pos_z"] = payloadStatus.pos_z;
-    m_payloadStatus["linear_velocity_x"] = payloadStatus.linear_velocity_x;
-    m_payloadStatus["linear_velocity_y"] = payloadStatus.linear_velocity_y;
-    m_payloadStatus["linear_velocity_z"] = payloadStatus.linear_velocity_z;
-    m_payloadStatus["angular_velocity_x"] = payloadStatus.angular_velocity_x;
-    m_payloadStatus["angular_velocity_y"] = payloadStatus.angular_velocity_y;
-    m_payloadStatus["angular_velocity_z"] = payloadStatus.angular_velocity_z;
-
-    // Split the payload_additional_info string
-    QString additionalInfo = QString::fromUtf8(payloadStatus.payload_additional_info);
-    QStringList infoParts = additionalInfo.split('/');
-
-    // Check if there are two parts
-    if (infoParts.size() >= 2) {
-        m_payloadStatus["companion_board_status"] = infoParts[0];
-        m_payloadStatus["payload_board_status"] = infoParts[1];
-    } else {
-        // Handle the case where there are not enough parts
-        m_payloadStatus["companion_board_status"] = "N/A";
-        m_payloadStatus["payload_board_status"] = "N/A";
-    }
+    m_payloadStatus[payloadStatus.command_target] = payloadStatus.command_value;
     // Emit the payloadStatusChanged signal to notify QML of the changes
     emit payloadStatusChanged();
 }

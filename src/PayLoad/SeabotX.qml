@@ -20,11 +20,14 @@ Rectangle {
     property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB , 20 : cameraRotationRelativeB , 19 : cameraRotationRelativeF}
     property var switches : {9:magnetSwitch , 10 : gripperSwitch , 5: lightSwitch}
 
+
+
+    property real status_width:          ScreenTools.defaultFontPixelWidth * 6
+
     Connections {
         target:     _activeJoystick
         onRawButtonPressedChanged: {
-            console.log("button "+index+" preesed"+pressed)
-            console.log(joystickSettingsWindow)
+            if(!_activeJoystick.inPayloadPage)_activeJoystick.setInPayloadPage(true)
             if(joystickSettingsWindow == null){
                 if(buttonMap.hasOwnProperty(index))buttonMap[index].joystickClicked(pressed)
                 else if(switches.hasOwnProperty(index) && pressed){
@@ -66,6 +69,16 @@ Rectangle {
                 }
 
             }
+            QGCTextField {
+                id: yRotationValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.yRotationRelative.toString()
+            }
         }     
 
         Row {
@@ -92,6 +105,16 @@ Rectangle {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
                 }
 
+            }
+            QGCTextField {
+                id: dockingValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.dockingRotationRelative.toString()
             }
         }  
 
@@ -120,6 +143,16 @@ Rectangle {
                 }
 
             }
+            QGCTextField {
+                id: probXValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.probXTransition.toString()
+            }
         }  
 
         Row {
@@ -146,6 +179,16 @@ Rectangle {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
                 }
 
+            }
+            QGCTextField {
+                id: probYValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.probYTransition.toString()
             }
         }  
 
@@ -174,6 +217,16 @@ Rectangle {
                 }
 
             }
+            QGCTextField {
+                id: probZValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.probZTransition.toString()
+            }
         }  
 
         Row {
@@ -201,6 +254,16 @@ Rectangle {
                 }
 
             }
+            QGCTextField {
+                id: deployTransValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.deployTransition.toString()
+            }
         }
 
         Row {
@@ -227,6 +290,16 @@ Rectangle {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
                 }
 
+            }
+            QGCTextField {
+                id: cameraRotValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.cameraRotationRelative.toString()
             }
         }
 

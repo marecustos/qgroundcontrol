@@ -33,11 +33,7 @@ Rectangle {
     Component.onCompleted:{
         console.log("payload loaded")
         _activeJoystick.setInPayloadPage(true)
-        console.log(_activeJoystick.inPayloadPage)
-        if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig
-        console.log(QGroundControl.linkManager.linkConfigurations.count)
-        console.log(QGroundControl.linkManager.payloadConfigExist())
-        console.log(_activeJoystick)   
+        if (QGroundControl.linkManager.payloadConfigExist()) linksettingsLoader.subEditConfig = editingConfig  
     }
 
     Component.onDestruction: {
@@ -204,7 +200,7 @@ Rectangle {
                                         if (joystickSettingsWindow === null ) {
                                             var component = Qt.createComponent("PayloadJoystickSettings.qml");
                                             if (component.status === Component.Ready) {
-                                                joystickSettingsWindow = component.createObject(null);
+                                                joystickSettingsWindow = component.createObject(null, { payloadBoard: bar.currentIndex === 0 ?"SeabotX":  "SeabotY" });
                                                 if (joystickSettingsWindow !== null) {
                                                     joystickSettingsWindow.show();
                                                 } else {
@@ -242,30 +238,32 @@ Rectangle {
                             }
 
                         }
-                        SeabotX{
-                            
+                        QGCTabBar {
+                            id:             bar
+                            width:          payloadControlLabel.width
+                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                            anchors.horizontalCenter:   parent.horizontalCenter
+                            Component.onCompleted: {
+                                currentIndex = 0
+                            }
+                            anchors.top:    payloadControlLabel.buttom
+                            QGCTabButton {
+                                text:       qsTr("Seabot X")
+                            }
+                            QGCTabButton {
+                                text:       qsTr("Seabot Y")
+                            }
+                            onCurrentIndexChanged : {
+                                if (joystickSettingsWindow != null) joystickSettingsWindow.close()
+                            }
+                        }
+                        Loader{
+                            source: bar.currentIndex === 0 ? "SeabotX.qml" : "SeabotY.qml"
+                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                            anchors.horizontalCenter:   parent.horizontalCenter
                         }
 
                 
-
-                //-- Payload Status
-                        Item {
-                            id:                         payloadStatusLabel
-                            width:                      setupViewPayload.width * 0.8
-                            height:                     payloadLabel.height
-                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
-                            anchors.horizontalCenter:   parent.horizontalCenter
-                            visible:                    true
-                            QGCLabel {
-                                id:             payloadLabel
-                                text:           qsTr("PayLoad Status")
-                                font.family:    ScreenTools.demiboldFontFamily
-                            }
-                        }
-
-                        PayloadStatus{
-                            
-                        }
 
                 Item { width: 1; height: _margins }
             }

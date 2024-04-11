@@ -926,7 +926,7 @@ signals:
     void joystickEnabledChanged         (bool enabled);
     void mavlinkMessageReceived         (const mavlink_message_t& message);
     void homePositionChanged            (const QGeoCoordinate& homePosition);
-    void payloadStatusChanged           (const mavlink_payload_status_t payloadStatus);
+    void payloadStatusChanged           (const mavlink_custom_payload_control_t payloadStatus);
     void armedPositionChanged();
     void armedChanged                   (bool armed);
     void flightModeChanged              (const QString& flightMode);
