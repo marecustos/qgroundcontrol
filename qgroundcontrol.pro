@@ -256,7 +256,9 @@ QT += \
     widgets \
     xml \
     texttospeech \
-    core-private
+    core-private \
+    webengine \
+    webenginewidgets
 
 # Multimedia only used if QVC is enabled
 !contains (DEFINES, QGC_DISABLE_UVC) {
@@ -397,6 +399,7 @@ INCLUDEPATH += \
     src/Geo \
     src/GPS \
     src/Joystick \
+    src/PayLoad \
     src/PlanView \
     src/MissionManager \
     src/PositionManager \
@@ -591,6 +594,7 @@ HEADERS += \
     src/Joystick/Joystick.h \
     src/Joystick/JoystickManager.h \
     src/Joystick/JoystickMavCommand.h \
+    src/PayLoad/payload.h \
     src/JsonHelper.h \
     src/KMLDomDocument.h \
     src/KMLHelper.h \
@@ -852,6 +856,7 @@ SOURCES += \
     src/Joystick/Joystick.cc \
     src/Joystick/JoystickManager.cc \
     src/Joystick/JoystickMavCommand.cc \
+    src/PayLoad/payload.cc \
     src/JsonHelper.cc \
     src/KMLDomDocument.cc \
     src/KMLHelper.cc \
