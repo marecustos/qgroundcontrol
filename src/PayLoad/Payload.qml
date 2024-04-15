@@ -28,6 +28,13 @@ Rectangle {
 
     PayloadController {
         id: payload_controller
+
+        onActivePayloadNameChanged: {
+            console.log("Active Payload Name changed:", payload_controller.activePayloadName)
+            if (payload_controller.activePayloadName != ""){
+                payloadNameTimer.stop()
+            }
+        }
     }
 
     Component.onCompleted:{
@@ -46,6 +53,18 @@ Rectangle {
         target: joystickSettingsWindow
         onClosing: {
             joystickSettingsWindow = null;
+        }
+    }
+
+    Timer {
+        id: payloadNameTimer
+        interval: 1000  // Adjust the interval as needed
+        repeat: true
+        running: true
+
+        onTriggered: {
+            payload_controller.sendPayloadNameRequest(404,"","",0)
+            console.log("Requesting Payload Name")
         }
     }
 

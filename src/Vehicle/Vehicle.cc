@@ -758,6 +758,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_CUSTOM_PAYLOAD_CONTROL:
         _handlePayloadStatus(message);
         break;
+    case MAVLINK_MSG_ID_CONNECTED_PAYLOAD:
+        _handlePayloadConnected(message);
+        break;
     case MAVLINK_MSG_ID_MOUNT_ORIENTATION:
         _handleGimbalOrientation(message);
         break;
@@ -1745,6 +1748,15 @@ void Vehicle::_handlePayloadStatus(mavlink_message_t& message)
     mavlink_msg_custom_payload_control_decode(&message, &payloadStatus);
 
     emit payloadStatusChanged(payloadStatus);
+}
+
+void Vehicle::_handlePayloadConnected(mavlink_message_t& message)
+{
+    mavlink_connected_payload_t connectedPayload;
+
+    mavlink_msg_connected_payload_decode(&message, &connectedPayload);
+
+    emit connectedPayloadChanged(connectedPayload);
 }
 
 
