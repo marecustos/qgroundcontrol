@@ -28,6 +28,13 @@ Rectangle {
 
     PayloadController {
         id: payload_controller
+
+        onActivePayloadNameChanged: {
+            console.log("Active Payload Name changed:", payload_controller.activePayloadName)
+            if (payload_controller.activePayloadName != ""){
+                payloadNameTimer.stop()
+            }
+        }
     }
 
     Component.onCompleted:{
@@ -46,6 +53,18 @@ Rectangle {
         target: joystickSettingsWindow
         onClosing: {
             joystickSettingsWindow = null;
+        }
+    }
+
+    Timer {
+        id: payloadNameTimer
+        interval: 1000  // Adjust the interval as needed
+        repeat: true
+        running: true
+
+        onTriggered: {
+            payload_controller.sendPayloadNameRequest(404,"","",0)
+            console.log("Requesting Payload Name")
         }
     }
 
@@ -200,7 +219,7 @@ Rectangle {
                                         if (joystickSettingsWindow === null ) {
                                             var component = Qt.createComponent("PayloadJoystickSettings.qml");
                                             if (component.status === Component.Ready) {
-                                                joystickSettingsWindow = component.createObject(null, { payloadBoard: bar.currentIndex === 0 ?"SeabotX":  "SeabotY" });
+                                                joystickSettingsWindow = component.createObject(null, { payloadBoard: payload_controller.activePayloadName  });
                                                 if (joystickSettingsWindow !== null) {
                                                     joystickSettingsWindow.show();
                                                 } else {
@@ -248,17 +267,11 @@ Rectangle {
                             }
                             anchors.top:    payloadControlLabel.buttom
                             QGCTabButton {
-                                text:       qsTr("Seabot X")
-                            }
-                            QGCTabButton {
-                                text:       qsTr("Seabot Y")
-                            }
-                            onCurrentIndexChanged : {
-                                if (joystickSettingsWindow != null) joystickSettingsWindow.close()
+                                text:    payload_controller.activePayloadName != "" ?   qsTr(payload_controller.activePayloadName): qsTr("No Payload is detected")
                             }
                         }
                         Loader{
-                            source: bar.currentIndex === 0 ? "SeabotX.qml" : "SeabotY.qml"
+                            source: payload_controller.activePayloadName === "seabotX" ? "SeabotX.qml" : payload_controller.activePayloadName === "seabotY" ? "SeabotY.qml" :null
                             anchors.margins:            ScreenTools.defaultFontPixelWidth*2
                             anchors.horizontalCenter:   parent.horizontalCenter
                         }

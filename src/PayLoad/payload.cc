@@ -25,6 +25,7 @@ PayloadController::_setActiveVehicle(Vehicle* vehicle)
     qCDebug(PayloadControllerLog) << "setting Vehicle in Payload Class";
     _vehicle = vehicle;
     connect(_vehicle, &Vehicle::payloadStatusChanged, this, &PayloadController::handlePayloadStatusChanged);
+    connect(_vehicle, &Vehicle::connectedPayloadChanged, this, &PayloadController::handleConnectedPayloadChanged);
 }
 
 bool PayloadController::sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message)
@@ -62,6 +63,36 @@ void PayloadController::sendControlCommand(const QString& target ,int value)
     qCDebug(PayloadControllerLog) << "command sent msg"<<msg.msgid;
 }
 
+void PayloadController::sendPayloadNameRequest(int payload_id , const QString& payload_name , const QString& payload_state , int result  )
+{
+    QByteArray temp;
+    temp = payload_name.toLocal8Bit();
+    const char *name = temp.data();
+
+    temp = payload_state.toLocal8Bit();
+    const char *state = temp.data();
+
+    if (!_link_manager->payloadLink()) {
+        qCDebug(PayloadControllerLog) << "payload name request: primary link gone!";
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_connected_payload_ack_pack(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        &msg,
+        payload_id,
+        name,
+        state,
+        result
+    );
+
+    this->sendPayloadMessageOnLinkThreadSafe(_link_manager->payloadLink(), msg);
+    //qCDebug(PayloadControllerLog) << "payload Name Resuest sent"<<msg.msgid;
+
+}
+
 QVariantMap PayloadController::payloadStatus() const
 {
     return m_payloadStatus;
@@ -74,4 +105,14 @@ void PayloadController::handlePayloadStatusChanged(const mavlink_custom_payload_
     m_payloadStatus[payloadStatus.command_target] = payloadStatus.command_value;
     // Emit the payloadStatusChanged signal to notify QML of the changes
     emit payloadStatusChanged();
+}
+
+void PayloadController::handleConnectedPayloadChanged(const mavlink_connected_payload_t &connectedPayload)
+{
+    //qCDebug(PayloadControllerLog) << "recieved payload connected "<< connectedPayload.payload_name;
+    if(_activePayloadName != connectedPayload.payload_name){
+        _activePayloadName = connectedPayload.payload_name;
+        emit activePayloadNameChanged();
+    }
+
 }
