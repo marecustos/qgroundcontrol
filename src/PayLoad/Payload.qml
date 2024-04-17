@@ -271,7 +271,7 @@ Rectangle {
                             }
                         }
                         Loader{
-                            source: payload_controller.activePayloadName === "seabotX" ? "SeabotX.qml" : payload_controller.activePayloadName === "seabotY" ? "SeabotY.qml" :null
+                            source: payload_controller.activePayloadName === "seabotx" ? "SeabotX.qml" : payload_controller.activePayloadName === "seaboty" ? "SeabotY.qml" :null
                             anchors.margins:            ScreenTools.defaultFontPixelWidth*2
                             anchors.horizontalCenter:   parent.horizontalCenter
                         }
