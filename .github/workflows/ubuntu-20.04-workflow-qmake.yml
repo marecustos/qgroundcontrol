@@ -1,4 +1,4 @@
-name: ubuntu-20.04-workflow
+name: ubuntu-20.04-workflow-qmake
 
 on:
   pull_request:
