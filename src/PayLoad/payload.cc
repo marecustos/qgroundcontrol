@@ -109,10 +109,21 @@ void PayloadController::handlePayloadStatusChanged(const mavlink_custom_payload_
 
 void PayloadController::handleConnectedPayloadChanged(const mavlink_connected_payload_t &connectedPayload)
 {
-    //qCDebug(PayloadControllerLog) << "recieved payload connected "<< connectedPayload.payload_name;
-    if(_activePayloadName != connectedPayload.payload_name){
+    QString linux_kernel_version = "linux_kernel_version";
+    QString payload_software_version = "payload_software_version";
+    QString companion_software_version = "companion_software_version";
+    QString payloadName = QString::fromUtf8(connectedPayload.payload_name);
+    //qCDebug(PayloadControllerLog) << "recieved payload connected "<< payloadName;
+    if (_activePayloadName != connectedPayload.payload_name && connectedPayload.payload_name != linux_kernel_version && connectedPayload.payload_name != payload_software_version && connectedPayload.payload_name != companion_software_version) {
         _activePayloadName = connectedPayload.payload_name;
         emit activePayloadNameChanged();
+    }
+    else if (connectedPayload.payload_name == linux_kernel_version || connectedPayload.payload_name == payload_software_version || connectedPayload.payload_name == companion_software_version){
+        //since using mavlink is temp and we won't stick with it , i used this ready message to send software informations (even it's not designed for that purpose)
+        qCDebug(PayloadControllerLog) << "recieved Software informations "<< payloadName;
+        m_payloadStatus[payloadName] = connectedPayload.payload_state;
+        // Emit the payloadStatusChanged signal to notify QML of the changes
+        emit payloadStatusChanged();
     }
 
 }
