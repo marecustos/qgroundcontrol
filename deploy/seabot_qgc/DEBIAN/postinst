@@ -2,30 +2,6 @@
 # © 2023 AymeN rachdi     <contact@aymenrachdi.xyz>
 
 
-if [ -e "/opt/QT_installed" ]; then
-    echo "QT already installed"
-else
-# Set default variables
-QT_VERSION="${QT_VERSION:-5.15.2}"
-QT_PATH="${QT_PATH:-/opt/Qt}"
-QT_HOST="${QT_HOST:-linux}"
-QT_TARGET="${QT_TARGET:-desktop}"
-#QT_MODULES="${QT_MODULES:-qtcharts}"
-QT_MODULES="${QT_MODULES:-qtcharts qtwebengine}"  # Added qtwebengine module
-echo "Installing QT ${QT_VERSION}"
-# Exit immediately if a command exits with a non-zero status
-set -e
-
-
-pip3 install aqtinstall
-#if testing on debian system uncomment bellow   
-#pip3 install aqtinstall --break-system
-aqt install-qt ${QT_HOST} ${QT_TARGET} ${QT_VERSION} -O ${QT_PATH} -m ${QT_MODULES}
-echo "Remember to export the following to your PATH: ${QT_PATH}/${QT_VERSION}/*/bin"
-echo "export PATH=$(readlink -e ${QT_PATH}/${QT_VERSION}/*/bin/):PATH"
-echo "${QT_VERSION}" > /opt/QT_installed
-echo "Deploying systemd service "
-
 
 
 
@@ -41,4 +17,3 @@ echo "Deploying systemd service "
    echo "seabot_qgc debian package is installed successfully"
 
 
-fi

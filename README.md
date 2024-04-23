@@ -23,6 +23,17 @@ To run qgc:
 bash deploy/docker/run.sh
 ~~~
 
+## Build the .deb package:
+~~~
+./deb_build
+~~~
+
+**and you find the deb package in  deploy/seabot_qgc.deb**
+
+## Install the .deb package 
+~~~
+sudo dpkg -i seabot_qgc.deb ; sudo apt install -f -y 
+~~~ 
 
 
 [![Releases](https://img.shields.io/github/release/mavlink/QGroundControl.svg)](https://github.com/mavlink/QGroundControl/releases)

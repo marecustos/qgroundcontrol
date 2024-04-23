@@ -14,7 +14,7 @@ Rectangle {
     QGCPalette { id: qgcPal }
     color:  qgcPal.window
     property real _columnSpacing:       ScreenTools.defaultFontPixelHeight * 0.25
-    property real _labelWidth:          ScreenTools.defaultFontPixelWidth * 28
+    property real _labelWidth:          ScreenTools.defaultFontPixelWidth * 35
     property real _valueWidth:          ScreenTools.defaultFontPixelWidth * 24
     property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
     property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
@@ -28,6 +28,13 @@ Rectangle {
 
     PayloadController {
         id: payload_controller
+
+        onActivePayloadNameChanged: {
+            console.log("Active Payload Name changed:", payload_controller.activePayloadName)
+            if (payload_controller.activePayloadName != ""){
+                payloadNameTimer.stop()
+            }
+        }
     }
 
     Component.onCompleted:{
@@ -46,6 +53,18 @@ Rectangle {
         target: joystickSettingsWindow
         onClosing: {
             joystickSettingsWindow = null;
+        }
+    }
+
+    Timer {
+        id: payloadNameTimer
+        interval: 1000  // Adjust the interval as needed
+        repeat: true
+        running: true
+
+        onTriggered: {
+            payload_controller.sendPayloadNameRequest(404,"","",0)
+            console.log("Requesting Payload Name")
         }
     }
 
@@ -200,7 +219,7 @@ Rectangle {
                                         if (joystickSettingsWindow === null ) {
                                             var component = Qt.createComponent("PayloadJoystickSettings.qml");
                                             if (component.status === Component.Ready) {
-                                                joystickSettingsWindow = component.createObject(null, { payloadBoard: bar.currentIndex === 0 ?"SeabotX":  "SeabotY" });
+                                                joystickSettingsWindow = component.createObject(null, { payloadBoard: payload_controller.activePayloadName  });
                                                 if (joystickSettingsWindow !== null) {
                                                     joystickSettingsWindow.show();
                                                 } else {
@@ -248,22 +267,118 @@ Rectangle {
                             }
                             anchors.top:    payloadControlLabel.buttom
                             QGCTabButton {
-                                text:       qsTr("Seabot X")
-                            }
-                            QGCTabButton {
-                                text:       qsTr("Seabot Y")
-                            }
-                            onCurrentIndexChanged : {
-                                if (joystickSettingsWindow != null) joystickSettingsWindow.close()
+                                text:    payload_controller.activePayloadName != "" ?   qsTr(payload_controller.activePayloadName): qsTr("No Payload is detected")
                             }
                         }
                         Loader{
-                            source: bar.currentIndex === 0 ? "SeabotX.qml" : "SeabotY.qml"
+                            source: payload_controller.activePayloadName === "seabotx" ? "SeabotX.qml" : payload_controller.activePayloadName === "seaboty" ? "SeabotY.qml" :null
                             anchors.margins:            ScreenTools.defaultFontPixelWidth*2
                             anchors.horizontalCenter:   parent.horizontalCenter
                         }
 
-                
+                //-- Software Information
+                    Item {
+                            id:                         payloadStatusLabel
+                            width:                      setupViewPayload.width * 0.8
+                            height:                     payloadLabel.height
+                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                            anchors.horizontalCenter:   parent.horizontalCenter
+                            visible:                    true
+                            QGCLabel {
+                                id:             payloadLabel
+                                text:           qsTr("Software Informations")
+                                font.family:    ScreenTools.demiboldFontFamily
+                            }
+                        }
+                    Rectangle {
+                        id : keyboardControlSpace
+                        height:         softwareInfoColoumn.height + (ScreenTools.defaultFontPixelHeight * 2)
+                        width:          setupViewPayload.width * 0.8
+                        color:          qgcPal.windowShade
+                        anchors.margins: ScreenTools.defaultFontPixelWidth
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    
+                        Column {
+                            anchors.centerIn: parent
+                            id : softwareInfoColoumn     
+                            spacing:    _columnSpacing
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Companion Memory Usage                  : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    width:              _valueWidth
+                                    text:               payload_controller.payloadStatus.mem_usage != undefined ? payload_controller.payloadStatus.mem_usage+" Mb" :""
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Companion CPU Usage                         : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    width:              _valueWidth
+                                    text:               payload_controller.payloadStatus.cpu_usage != undefined ? payload_controller.payloadStatus.cpu_usage + " %" : ""
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Payload Software Version                     : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    width:              _valueWidth
+                                    text:               payload_controller.payloadStatus.payload_soft_version
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Companion Software Version              : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    width:              _valueWidth
+                                    text:               payload_controller.payloadStatus.companion_soft_version
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Linux Kernel Version                              : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    width:              _valueWidth
+                                    text:               payload_controller.payloadStatus.linux_kernel_version
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                        }
+                    }
 
                 Item { width: 1; height: _margins }
             }

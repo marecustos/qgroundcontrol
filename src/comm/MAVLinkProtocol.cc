@@ -206,7 +206,7 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, QByteArray b)
     uint8_t mavlinkChannel = link->mavlinkChannel();
 
     for (int position = 0; position < b.size(); position++) {
-        if (mavlink_parse_char(mavlinkChannel, static_cast<uint8_t>(b[position]), &_message, &_status) || (link == _linkMgr->payloadLink() && _message.msgid == MAVLINK_MSG_ID_CUSTOM_PAYLOAD_CONTROL) ) {
+        if (mavlink_parse_char(mavlinkChannel, static_cast<uint8_t>(b[position]), &_message, &_status) || (link == _linkMgr->payloadLink() && (_message.msgid == MAVLINK_MSG_ID_CUSTOM_PAYLOAD_CONTROL || _message.msgid == MAVLINK_MSG_ID_CONNECTED_PAYLOAD )) ) {
             // Got a valid message
             if (!link->decodedFirstMavlinkPacket()) {
                 link->setDecodedFirstMavlinkPacket(true);
