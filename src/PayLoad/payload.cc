@@ -7,6 +7,32 @@
 
 QGC_LOGGING_CATEGORY(PayloadControllerLog, "PayloadControllerLog")
 
+PingThread::PingThread(const QString& ipAddress) : ipAddress(ipAddress) {
+    moveToThread(this);
+    start();
+}
+
+void PingThread::run() {
+    while (!isInterruptionRequested()) {
+        QProcess pingProcess;
+        pingProcess.start("ping", QStringList() << "-c" << "1" << ipAddress); // Ping once
+        pingProcess.waitForFinished();
+        bool success = (pingProcess.exitCode() == 0);
+        emit pingResult(success);
+        if(success)msleep(1000); // Wait for 1 second before pinging again
+    }
+}
+
+NvidiaStateDetector::NvidiaStateDetector(void)
+{
+    pingThread = new PingThread("seabot-companion.local");
+    pingThread->start();
+    connect(pingThread, &PingThread::pingResult, this, &NvidiaStateDetector::onPingResult);
+}
+
+void NvidiaStateDetector::onPingResult(bool success) {
+    emit pingResult(success);
+}
 PayloadController::PayloadController(void) 
     :_vehicle(nullptr),
     _toolbox(qgcApp()->toolbox())
