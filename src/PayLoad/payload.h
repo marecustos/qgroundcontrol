@@ -6,6 +6,7 @@
 #include <QVariantMap>
 #include "QGCMAVLink.h"
 #include "QGCToolbox.h"
+#include <QThread>
 
 class  MultiVehicleManager;
 class  Vehicle;
@@ -13,6 +14,18 @@ class LinkInterface;
 
 Q_DECLARE_LOGGING_CATEGORY(PayloadControllerLog)
 
+class PingThread : public QThread
+{
+    Q_OBJECT
+public:
+    PingThread(const QString& ipAddress);
+signals:
+    void pingResult(bool success);
+protected:
+    void run() override;
+private:
+    QString ipAddress;
+};
 
 class PayloadController : public QObject
 {
@@ -44,6 +57,25 @@ private:
     QGCToolbox* _toolbox = nullptr;
     LinkManager*  _link_manager = nullptr;
     QString _activePayloadName;
+
+};
+
+class NvidiaStateDetector : public QObject
+{
+    Q_OBJECT
+
+public:
+
+    NvidiaStateDetector(void);
+
+private slots:
+    void onPingResult(bool success);
+
+signals:
+    void pingResult(bool success);
+
+private:
+    PingThread* pingThread;
 
 };
 

@@ -8,6 +8,7 @@ import QGroundControl.ScreenTools       1.0
 import QGroundControl.Controls          1.0
 import QGroundControl.FactControls      1.0
 import QGroundControl.Palette           1.0
+import QGroundControl.Controllers           1.0
 
 // Toolbar for Plan View
 Item {
@@ -67,6 +68,15 @@ Item {
     property string _batteriesRequiredText:     _batteriesRequired < 0 ?        qsTr("N/A") : _batteriesRequired
 
     readonly property real _margins: ScreenTools.defaultFontPixelWidth
+    property var nvidiaON : null
+
+    NvidiaStateDetector{
+        onPingResult : {
+            //console.log("saying nvidia is on is ")
+            //console.log(success)
+            nvidiaON = success
+        }
+    }
 
     function getMissionTime() {
         if (!_missionTime) {
@@ -126,7 +136,7 @@ Item {
         anchors.leftMargin:     _margins
         anchors.left:           parent.left
         columnSpacing:          0
-        columns:                4
+        columns:                6
 
         GridLayout {
             columns:                8
@@ -259,6 +269,23 @@ Item {
                 duration:       2000
             }
         }
+
+        QGCLabel {
+            anchors.margins:    _margin
+            anchors.verticalCenter: parent.verticalCenter
+            text:               qsTr("   Companion   ")
+            font: ScreenTools.defaultFontPointSize
+            property real _margin: ScreenTools.defaultFontPixelWidth 
+        }
+
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width:                  ScreenTools.defaultFontPixelWidth * 3 
+            height:                 width
+            radius:                 width / 2
+            color:                  nvidiaON == true? "green": "red"
+        }
+        
     }
 
     // Small mission download progress bar
