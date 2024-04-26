@@ -8,7 +8,7 @@ Restart=always
 RestartSec=5
 User=seabot
 Group=seabot
-Environment=DISPLAY=:1
+Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/seabot/.Xauthority
 StandardOutput=syslog
 StandardError=syslog

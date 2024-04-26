@@ -14,7 +14,7 @@ set -e
 
 apt-get update
 apt-get install python3 python3-pip -y
-pip3 install aqtinstall
+pip3 install aqtinstall --break-system
 aqt install-qt ${QT_HOST} ${QT_TARGET} ${QT_VERSION} -O ${QT_PATH} -m ${QT_MODULES}
 echo "Remember to export the following to your PATH: ${QT_PATH}/${QT_VERSION}/*/bin"
 echo "export PATH=$(readlink -e ${QT_PATH}/${QT_VERSION}/*/bin/):PATH"

@@ -2,34 +2,40 @@
 
 # Build the package
 . deploy/docker/build-release.sh
-#remove old compiled qgc
 
-#if you want to include the qt in the package incomment this 
-. ./deploy/docker/install-qt-linux.sh
-rm -r deploy/seabot_qgc/opt/Qt
-mkdir -p deploy/seabot_qgc/opt/
-sudo cp -r /opt/Qt deploy/seabot_qgc/
-sudo chown -R $USER:$USER deploy/seabot_qgc/Qt
+# Set up variables
+QT_INSTALL_DIR="/opt/Qt"
+SEABOT_QGC_DIR="deploy/seabot_qgc"
 
-rm -r deploy/seabot_qgc/usr/bin
-mkdir -p deploy/seabot_qgc/usr/bin
-cp -r seabot_qgc/QGroundControl deploy/seabot_qgc/usr/bin
+# Remove old compiled QGC
+# Comment this out if not needed
+# rm -r deploy/seabot_qgc/opt/Qt
 
-rm -r deploy/seabot_qgc/usr/share/qgroundcontrol
-mkdir -p deploy/seabot_qgc/usr/share/qgroundcontrol
-cp -r resources/ deploy/seabot_qgc/usr/share/qgroundcontrol
+# Copy Qt to the package
+sudo cp -r "$QT_INSTALL_DIR" "$SEABOT_QGC_DIR/opt/"
+sudo chown -R $USER:$USER "$SEABOT_QGC_DIR/opt/Qt"
 
-rm -r deploy/seabot_qgc/usr/share/pixmaps
-mkdir -p deploy/seabot_qgc/usr/share/pixmaps
-cp -r resources/icons/qgroundcontrol.png deploy/seabot_qgc/usr/share/pixmaps
+# Copy QGroundControl binary
+rm -r "$SEABOT_QGC_DIR/usr/bin"
+mkdir -p "$SEABOT_QGC_DIR/usr/bin"
+cp -r seabot_qgc/QGroundControl "$SEABOT_QGC_DIR/usr/bin"
 
-rm -r deploy/seabot_qgc/lib/
-mkdir -p deploy/seabot_qgc/lib/x86_64-linux-gnu/
-cp  seabot_qgc/libs/shapelib/libshp.so* deploy/seabot_qgc/lib/x86_64-linux-gnu/
+# Copy resources
+rm -r "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+mkdir -p "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+cp -r resources/ "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
 
-mkdir -p deploy/seabot_qgc/lib/x86_64-linux-gnu/
-cp  seabot_qgc/libs/qmlglsink/libqmlglsink.*so deploy/seabot_qgc/lib/x86_64-linux-gnu/
+# Copy icon
+rm -r "$SEABOT_QGC_DIR/usr/share/pixmaps"
+mkdir -p "$SEABOT_QGC_DIR/usr/share/pixmaps"
+cp -r resources/icons/qgroundcontrol.png "$SEABOT_QGC_DIR/usr/share/pixmaps"
 
-cd  deploy
+# Copy libraries
+mkdir -p "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+cp seabot_qgc/libs/shapelib/libshp.so* "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+cp seabot_qgc/libs/qmlglsink/libqmlglsink.*so "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+
+# Build Debian package
+cd deploy
 dpkg-deb --build seabot_qgc
 cd ..
