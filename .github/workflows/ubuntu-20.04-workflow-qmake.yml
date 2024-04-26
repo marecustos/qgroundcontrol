@@ -81,7 +81,7 @@ jobs:
       - name: Build
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run:  |
-              qmake  ${SOURCE_DIR}
+              qmake  ${SOURCE_DIR} CONFIG+=debug
               make -j2
 
       - name: ccache post-run
