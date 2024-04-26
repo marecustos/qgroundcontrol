@@ -297,12 +297,6 @@
         <file alias="SeabotY.qml">src/PayLoad/SeabotY.qml</file>
         <file alias="PayloadStatus.qml">src/PayLoad/PayloadStatus.qml</file>
         <file alias="client.html">src/ui/toolbar/UtDPU/Client.html</file>
-        <file alias="Client.js">src/ui/toolbar/UtDPU/Client.js</file>
-        <file alias="ClientCommon.js">src/ui/toolbar/UtDPU/ClientCommon.js</file>
-        <file alias="CommandUtils.js">src/ui/toolbar/UtDPU/CommandUtils.js</file>
-        <file alias="HtmlUtils.js">src/ui/toolbar/UtDPU/HtmlUtils.js</file>
-        <file alias="JsonUtils.js">src/ui/toolbar/UtDPU/JsonUtils.js</file>
-        <file alias="lz4.js">src/ui/toolbar/UtDPU/lz4.js</file>
 
 
         

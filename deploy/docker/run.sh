@@ -15,4 +15,4 @@ docker run \
     -v /etc/udev:/etc/udev \
     -v  ~/.config:/home/user/.config \
     qgc-linux-docker \
-    /project/build/QGroundControl 
+    /project/build/staging/QGroundControl 
