@@ -397,6 +397,7 @@ INCLUDEPATH += \
     src/Geo \
     src/GPS \
     src/Joystick \
+    src/PayLoad \
     src/PlanView \
     src/MissionManager \
     src/PositionManager \
@@ -590,6 +591,7 @@ HEADERS += \
     src/FollowMe/FollowMe.h \
     src/Joystick/Joystick.h \
     src/Joystick/JoystickManager.h \
+    src/PayLoad/payload.h \
     src/Joystick/JoystickMavCommand.h \
     src/JsonHelper.h \
     src/KMLDomDocument.h \
@@ -850,6 +852,7 @@ SOURCES += \
     src/Compression/QGCZlib.cc \
     src/FollowMe/FollowMe.cc \
     src/Joystick/Joystick.cc \
+    src/PayLoad/payload.cc \
     src/Joystick/JoystickManager.cc \
     src/Joystick/JoystickMavCommand.cc \
     src/JsonHelper.cc \
