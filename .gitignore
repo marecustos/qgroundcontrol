@@ -1,4 +1,5 @@
 seabot_qgc
+*.AppImage
 *.deb
 deploy/package/home/
 .idea/

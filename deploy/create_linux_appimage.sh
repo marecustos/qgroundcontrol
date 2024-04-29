@@ -50,9 +50,10 @@ find ../ -name *.deb -exec dpkg -x {} . \;
 
 # copy libdirectfb-1.2.so.9
 cd ${TMPDIR}
-wget -c --quiet http://ftp.us.debian.org/debian/pool/main/d/directfb/libdirectfb-1.2-9_1.2.10.0-5.1_amd64.deb
+wget -c --quiet http://sg.archive.ubuntu.com/ubuntu/pool/universe/d/directfb/libdirectfb-1.2-9_1.2.10.0-5.1_amd64.deb
 mkdir libdirectfb
 dpkg -x libdirectfb-1.2-9_1.2.10.0-5.1_amd64.deb libdirectfb
+mkdir -p ${APPDIR}/usr/lib/x86_64-linux-gnu/
 cp -L libdirectfb/usr/lib/x86_64-linux-gnu/libdirectfb-1.2.so.9 ${APPDIR}/usr/lib/x86_64-linux-gnu/
 cp -L libdirectfb/usr/lib/x86_64-linux-gnu/libfusion-1.2.so.9 ${APPDIR}/usr/lib/x86_64-linux-gnu/
 cp -L libdirectfb/usr/lib/x86_64-linux-gnu/libdirect-1.2.so.9 ${APPDIR}/usr/lib/x86_64-linux-gnu/
@@ -68,16 +69,16 @@ cp ${QGC_CUSTOM_APP_ICON} ${APPDIR}/
 cat > ./QGroundControl.desktop <<\EOF
 [Desktop Entry]
 Type=Application
-Name=${QGC_CUSTOM_APP_NAME}
-GenericName=${QGC_CUSTOM_GENERIC_NAME}
+Name=QGroundControl
+GenericName=Ground Control Station
 Comment=UAS ground control station
-Icon=${QGC_CUSTOM_APP_ICON_NAME}
-Exec=AppRun
+Icon=qgroundcontrol
+Exec=qgroundcontrol-start.sh
 Terminal=false
 Categories=Utility;
-Keywords=computer;
-EOF
 
+EOF
+cp ./QGroundControl.desktop ${APPDIR}/
 VERSION=$(strings ${APPDIR}/${QGC_CUSTOM_BINARY_NAME} | grep '^v[0-9*]\.[0-9*].[0-9*]' | head -n 1)
 echo ${QGC_CUSTOM_APP_NAME} Version: ${VERSION}
 
