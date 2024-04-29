@@ -84,4 +84,4 @@ RUN usermod -a -G dialout user
 USER user
 
 WORKDIR /project/build
-CMD cmake /project/source && make -j$(nproc)
+CMD qmake /project/source && make -j$(nproc)
