@@ -13,6 +13,9 @@ QMAKE_PROJECT_DEPTH = 0 # undocumented qmake flag to force absolute paths in mak
 DEFINES += QGC_GST_TAISYNC_DISABLED
 DEFINES += QGC_GST_MICROHARD_DISABLED
 
+RESOURCES += ./js.qrc
+QTQUICK_COMPILER_SKIPPED_RESOURCES += ./js.qrc
+
 exists($${OUT_PWD}/qgroundcontrol.pro) {
     error("You must use shadow build (e.g. mkdir build; cd build; qmake ../qgroundcontrol.pro).")
 }
@@ -256,7 +259,9 @@ QT += \
     widgets \
     xml \
     texttospeech \
-    core-private
+    core-private \
+    webengine \
+    webenginecore
 
 # Multimedia only used if QVC is enabled
 !contains (DEFINES, QGC_DISABLE_UVC) {
@@ -1297,6 +1302,7 @@ contains (DEFINES, QGC_DISABLE_MAVLINK_INSPECTOR) {
         src/AnalyzeView/MAVLinkInspectorController.cc
     QT += \
         charts
+        webengine
 }
 
 #-------------------------------------------------------------------------------------
