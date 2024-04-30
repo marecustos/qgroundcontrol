@@ -260,7 +260,8 @@ QT += \
     xml \
     texttospeech \
     core-private \
-    webengine 
+    webengine \
+    webenginecore
 
 # Multimedia only used if QVC is enabled
 !contains (DEFINES, QGC_DISABLE_UVC) {

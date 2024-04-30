@@ -37,7 +37,7 @@ jobs:
           host: linux
           target: desktop
           dir: ${{ runner.temp }}
-          modules: qtcharts
+          modules: qtcharts qtwebengine
           setup-python: true
 
       - name: Install QGC source dependencies
