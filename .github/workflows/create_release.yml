@@ -112,6 +112,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/deploy/QGroundControl.AppImage
+          asset_path: ${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage
           asset_name: QGroundControl.AppImage
           asset_content_type: application/octet-stream

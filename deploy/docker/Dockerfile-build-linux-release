@@ -42,9 +42,7 @@ RUN apt-get update && apt-get -y --quiet --no-install-recommends install \
 		libespeak-dev \
 		libfontconfig1 \
 		libfuse2 \
-		libgstreamer-* \
-		libgstreamer1.0-0 \
-		libgstreamer1.0-dev \
+		libgstreamer* \
 		libsdl2-dev \
 		libssl-dev \
 		libudev-dev \
@@ -70,7 +68,7 @@ RUN apt-get update && apt-get install -y \
     libxi-dev libxkbcommon-dev libxkbcommon-x11-dev \
     libxkbcommon-x11-0 libxcb-xinerama0 libxcb-* \
     libxcb-xinerama0-dev libxkbcommon-x11-dev
-	
+
 # Install Qt
 COPY deploy/docker/install-qt-linux.sh /tmp/qt/
 RUN /tmp/qt/install-qt-linux.sh
