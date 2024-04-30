@@ -100,8 +100,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.pull_request.head.ref }}
-          release_name: Release ${{ github.event.pull_request.head.ref }}
+          tag_name: v4.3.0
+          release_name: Seabot_QGC v1.0.0
           draft: false
           prerelease: false
 
