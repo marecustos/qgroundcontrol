@@ -16,6 +16,6 @@ Rectangle {
 
     WebEngineView {
             anchors.fill: parent
-            url: "qrc:///qml/client.html"
+            url: "qrc:///jsqml/client.html"
         }
 }

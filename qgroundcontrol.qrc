@@ -296,7 +296,6 @@
         <file alias="SeabotX.qml">src/PayLoad/SeabotX.qml</file>
         <file alias="SeabotY.qml">src/PayLoad/SeabotY.qml</file>
         <file alias="PayloadStatus.qml">src/PayLoad/PayloadStatus.qml</file>
-        <file alias="client.html">src/ui/toolbar/UtDPU/Client.html</file>
 
 
         

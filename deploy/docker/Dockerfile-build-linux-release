@@ -84,4 +84,5 @@ RUN usermod -a -G dialout user
 USER user
 
 WORKDIR /project/seabot_qgc
-CMD cmake -DCMAKE_BUILD_TYPE=Release /project/source && make -j$(nproc) && rm -rf CMake*
+CMD qmake CONFIG+=StableBuild CONFIG+=installer /project/source && make -j$(nproc) 
+#-DCMAKE_BUILD_TYPE=ReleaseCMD qmake /project/source && make -j$(nproc)

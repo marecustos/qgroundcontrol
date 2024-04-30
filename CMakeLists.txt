@@ -177,6 +177,7 @@ set(QGC_RESOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/qgcimages.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/qgcresources.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/qgroundcontrol.qrc
+	${CMAKE_CURRENT_SOURCE_DIR}/js.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/resources/InstrumentValueIcons/InstrumentValueIcons.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/src/FirmwarePlugin/APM/APMResources.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/src/FirmwarePlugin/PX4/PX4Resources.qrc
