@@ -8,6 +8,7 @@
 #copying host 
     cp /etc/hosts /etc/hosts.bak
     cp /home/hosts /etc
+    cp /home/QGroundControl.ini /home/seabot/.config/QGroundControl.org/
 
 #Deploying systemd service 
    systemctl daemon-reload
