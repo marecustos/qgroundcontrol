@@ -153,3 +153,99 @@ void PayloadController::handleConnectedPayloadChanged(const mavlink_connected_pa
     }
 
 }
+
+PayloadLogDownloader::PayloadLogDownloader(void)
+{
+    qDebug()<<"Payload Log Downloader initialized";
+}
+void PayloadLogDownloader::refreshCompanionLog()
+{
+    PayloadLogDownloaderThread *thread = new PayloadLogDownloaderThread(0);
+    connect(thread, &PayloadLogDownloaderThread::filesRefreshed, this, &PayloadLogDownloader::filesRefreshed);
+    thread->start();
+}
+
+void PayloadLogDownloader::downloadLogs(const QString& fileName, const QString& destination)
+{
+    PayloadLogDownloaderThread *thread = new PayloadLogDownloaderThread(1,fileName , destination);
+    thread->start();
+}
+
+PayloadLogDownloaderThread::PayloadLogDownloaderThread(int command, QObject *parent)
+    : QThread(parent), m_command(command)
+{
+    qDebug()<<"Payload Log Downloader initialized";
+}
+
+PayloadLogDownloaderThread::PayloadLogDownloaderThread(int command,QString fileName, QString destination , QObject *parent)
+    : QThread(parent), m_command(command),m_file_name(fileName),m_destination(destination)
+{
+    qDebug()<<"Payload Log Downloader initialized";
+}
+
+void PayloadLogDownloaderThread::run()
+{
+    qDebug()<<"running with command "<<m_command;
+    if (m_command == 0) {
+
+        QStringList logs;
+        // Execute refresh command
+        QProcess process;
+        QStringList args;
+        args << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << "-l" << m_username << m_host << "ls -l" << m_remoteDir;
+
+        process.start("sshpass", args);
+        process.waitForFinished();
+
+        if (process.exitCode() == 0) {
+            QString output = process.readAllStandardOutput();
+            if (output.isEmpty()) {
+                qDebug() << "No files found in the remote directory.";
+            } else {
+                QStringList lines = output.split("\n", Qt::SkipEmptyParts);
+                foreach (const QString& line, lines) {
+                    QStringList parts = line.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+                    if (parts.size() >= 8) {
+                        QString size = parts[4];
+                        QString unit;
+                        double sizeValue = size.toDouble();
+                        if (sizeValue >= 1024 * 1024 * 1024) {
+                            size = QString::number(sizeValue / (1024 * 1024 * 1024), 'f', 2);
+                            unit = "GB";
+                        } else if (sizeValue >= 1024 * 1024) {
+                            size = QString::number(sizeValue / (1024 * 1024), 'f', 2);
+                            unit = "MB";
+                        } else if (sizeValue >= 1024) {
+                            size = QString::number(sizeValue / 1024, 'f', 2);
+                            unit = "KB";
+                        } else {
+                            unit = "B";
+                        }
+
+                        QString fileInfo = parts.last() + "//" + parts[5] + " " + parts[6] + " " + parts[7] + "//" + size + unit;
+                        // Emit signal or handle fileInfo as needed
+                        logs.append(fileInfo);
+                    }
+                }
+            }
+        } else {
+            qDebug() << "Error executing SSH command:" << process.errorString();
+        }
+        emit filesRefreshed(logs);
+    } else if (m_command == 1) {
+        // Execute download command
+        // Implement download logic here
+        QProcess process;
+        QStringList args;
+        args << "-p" << m_password << "scp" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << m_username + "@" + m_host + ":" + m_remoteDir + "/" + m_file_name <<m_destination;
+
+        process.start("sshpass", args);
+        process.waitForFinished();
+
+        if (process.exitCode() == 0) {
+            qDebug() << "File downloaded successfully:" << m_file_name;
+        } else {
+            qDebug() << "Error downloading file:" << m_file_name << process.errorString();
+        }
+    }
+}

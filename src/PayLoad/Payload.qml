@@ -1,6 +1,8 @@
 import QtQuick          2.3
 import QtQuick.Window   2.2
 import QtQuick.Controls 1.2
+import QtQuick.Dialogs 1.3
+
 
 import QGroundControl               1.0
 import QGroundControl.Palette       1.0
@@ -37,6 +39,19 @@ Rectangle {
         }
     }
 
+    PayloadLogDownloader{
+        id: payloadLogDownloader
+        onFilesRefreshed: {
+            console.log("updating table view")
+            console.log(files)
+            tableModel.clear()
+            for (var i = 0; i < files.length; ++i) {
+                var fileInfo = files[i].split("//")
+                tableModel.append({"name": fileInfo[0], "date": fileInfo[1], "size": fileInfo[2]})
+            }
+        }
+    }
+
     Component.onCompleted:{
         console.log("payload loaded")
         _activeJoystick.setInPayloadPage(true)
@@ -64,7 +79,7 @@ Rectangle {
 
         onTriggered: {
             payload_controller.sendPayloadNameRequest(404,"","",0)
-            console.log("Requesting Payload Name")
+            //console.log("Requesting Payload Name")
         }
     }
 
@@ -378,6 +393,125 @@ Rectangle {
                             }
                             
                         }
+                    }
+
+                //-- Companion Log Downloader
+                    Item {
+                        id:                         companionLogDownloader
+                        width:                      setupViewPayload.width * 0.8
+                        height:                     companionLogDownloaderLabel.height
+                        anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                        anchors.horizontalCenter:   parent.horizontalCenter
+                        visible:                    true
+                        QGCLabel {
+                            id:             companionLogDownloaderLabel
+                            text:           qsTr("Companion Log Downloader")
+                            font.family:    ScreenTools.demiboldFontFamily
+                        }
+                    }
+
+                    RowLayout {
+                        width:                      setupViewPayload.width * 0.8
+                        anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                        anchors.horizontalCenter:   parent.horizontalCenter
+
+                        TableView {
+                            id: tableView
+                            selectionMode:      SelectionMode.MultiSelection
+                            anchors.margins:            ScreenTools.defaultFontPixelWidth*2
+                            Layout.preferredWidth: parent.width * 0.9
+                            
+
+                            TableViewColumn {
+                                title: qsTr("Name")
+                                horizontalAlignment: Text.AlignHCenter
+                                delegate : Text  {
+                                    color: styleData.textColor
+                                    text: model?model.name:null
+                                }
+                            }
+
+                            TableViewColumn {
+                                title: qsTr("Date")
+                                horizontalAlignment: Text.AlignHCenter
+                                delegate: Text  {
+                                    color: styleData.textColor
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: model?model.date:null
+                                }
+                            }
+
+                            TableViewColumn {
+                                title: qsTr("Size")
+                                horizontalAlignment: Text.AlignHCenter
+                                delegate : Text  {
+                                    color: styleData.textColor
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: model?model.size:null
+                                }
+                            }
+
+                            TableViewColumn {
+                                title: qsTr("Status")
+                                horizontalAlignment: Text.AlignHCenter
+                                delegate : Text  {
+                                    color: styleData.textColor
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
+
+                            model: ListModel {
+                                id: tableModel
+                            }
+
+                            onSelectionChanged: {
+                                console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                            }
+                        }
+
+                        Column {
+                            id: downloadColumn
+                            Layout.preferredWidth: parent.width * 0.1
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+
+                            QGCButton {
+                                text:       qsTr("Refresh")
+                                width:      downloadColumn.width
+                                onClicked:{
+                                    payloadLogDownloader.refreshCompanionLog()
+                                }
+                            }
+
+                            QGCButton {
+                                id: downloadButton
+                                text: qsTr("Download")
+                                width: downloadColumn.width
+                                enabled: tableView.selection.count >0
+                                onClicked: {
+                                    fileDialog.title =          qsTr("Select save directory")
+                                    fileDialog.selectExisting = true
+                                    fileDialog.folder =         QGroundControl.settingsManager.appSettings.logSavePath
+                                    fileDialog.selectFolder =   true
+                                    fileDialog.openForLoad()
+                                }
+                            }
+
+                            QGCFileDialog {
+                                id: fileDialog
+                                onAcceptedForLoad: {
+                                    tableView.selection.forEach(function(rowIndex) {
+                                        var item = tableModel.get(rowIndex);
+                                        if (item) {
+                                            console.log("Selected row name:", item.name);
+                                            payloadLogDownloader.downloadLogs(item.name,file)
+                                        }
+                                    });
+                                    close()
+                                }
+                            }
+                        }
+
                     }
 
                 Item { width: 1; height: _margins }
