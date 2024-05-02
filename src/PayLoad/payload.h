@@ -27,6 +27,37 @@ private:
     QString ipAddress;
 };
 
+class PayloadLogDownloaderThread : public QThread
+{
+    Q_OBJECT
+public:
+    explicit PayloadLogDownloaderThread(int command, QObject *parent = nullptr);
+    explicit PayloadLogDownloaderThread(int command,QString fileName , QString destination , QObject *parent = nullptr);
+    void run() override;
+signals:
+    void filesRefreshed(QStringList files);
+private:
+    int m_command ; // 0 for refresh and 1 for Download 
+    QString m_host = "seabot-companion.local";
+    QString m_remoteDir = "/home/seabot/logs";//.ros/log
+    QString m_username = "seabot";
+    QString m_password = "seabot758400";
+    QString m_file_name = "";
+    QString m_destination = "./";
+};
+
+class PayloadLogDownloader : public QObject
+{
+    Q_OBJECT
+
+public:
+    PayloadLogDownloader(void);
+    Q_INVOKABLE void refreshCompanionLog();
+    Q_INVOKABLE void downloadLogs(const QString& fileName , const QString& destination);
+signals:
+    void filesRefreshed(QStringList files);
+};
+
 class PayloadController : public QObject
 {
     Q_OBJECT
