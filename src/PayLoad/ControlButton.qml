@@ -11,6 +11,7 @@ import QGroundControl.ScreenTools   1.0
 Button {
     property string targetCommand: ""
     property int valueCommand: 0
+    property int speed : 25
     id : customButton
 
 
@@ -19,7 +20,7 @@ Button {
     
     Timer {
         id: clickTimer
-        property var timer_interval : 15
+        property var timer_interval : customButton.speed
         interval: timer_interval  // Adjust the interval as needed
         repeat: true
         running: false
@@ -48,7 +49,7 @@ Button {
             onPressed: {
                 // Start the timer when the mouse area is pressed
                 customButtonRectangle.color = qgcPal.colorGrey
-                clickTimer.timer_interval = 33
+                clickTimer.timer_interval = customButton.speed+10
                 clickTimer.restart()
 
             }
@@ -65,7 +66,7 @@ Button {
         if (buttonState){
             customButtonRectangle.color = qgcPal.colorGrey
             controlButtonPressed(targetCommand, valueCommand)
-            clickTimer.timer_interval=23
+            clickTimer.timer_interval = customButton.speed
             clickTimer.restart()
         }
         else{
