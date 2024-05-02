@@ -76,6 +76,45 @@ Rectangle {
                 verticalAlignment: TextInput.AlignVCenter
                 text: payload_controller.payloadStatus.yRotationRelative.toString()
             }
+
+            QGCCheckBox {
+                id: advancedCheckBoxYRotation
+                text: "Advanced"
+                anchors.verticalCenter: parent.verticalCenter
+
+            }
+
+            Slider {
+                id: sliderYRotation
+                minimumValue: 1
+                maximumValue: 100
+                stepSize: 1
+                value: 90
+                anchors.verticalCenter: parent.verticalCenter
+                visible: advancedCheckBoxYRotation.checked
+
+                // Bind the value of the slider to the speed property of the buttons
+                onValueChanged: {
+                    yRotationF.speed = 300 - value * 2.99 // Map slider value to speed (1 to 300)
+                    yRotationB.speed = 300 - value * 2.99
+                }
+            }
+
+            SpinBox {
+                id: spinBoxYRotation
+                minimumValue: sliderYRotation.minimumValue
+                maximumValue: sliderYRotation.maximumValue
+                stepSize: 1
+                width: 50
+                value: sliderYRotation.value // Initialize the spin box value with the slider value
+                anchors.verticalCenter: parent.verticalCenter
+                visible: advancedCheckBoxYRotation.checked
+
+                // Bind the value of the spin box to the slider value
+                onValueChanged: {
+                    sliderYRotation.value = value
+                }
+            }
         }     
 
         Row {
@@ -112,6 +151,45 @@ Rectangle {
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: TextInput.AlignVCenter
                 text: payload_controller.payloadStatus.cameraRotationRelative.toString()
+            }
+
+            QGCCheckBox {
+                id: advancedCheckBoxCamera
+                text: "Advanced"
+                anchors.verticalCenter: parent.verticalCenter
+
+            }
+
+            Slider {
+                id: sliderCamera
+                minimumValue: 1
+                maximumValue: 100
+                stepSize: 1
+                value: 90
+                anchors.verticalCenter: parent.verticalCenter
+                visible: advancedCheckBoxCamera.checked
+
+                // Bind the value of the slider to the speed property of the buttons
+                onValueChanged: {
+                    cameraRotationRelativeF.speed = 300 - value * 2.99 // Map slider value to speed (1 to 300)
+                    cameraRotationRelativeB.speed = 300 - value * 2.99
+                }
+            }
+
+            SpinBox {
+                id: spinBoxCamera
+                minimumValue: sliderCamera.minimumValue
+                maximumValue: sliderCamera.maximumValue
+                stepSize: 1
+                width: 50
+                value: sliderCamera.value // Initialize the spin box value with the slider value
+                anchors.verticalCenter: parent.verticalCenter
+                visible: advancedCheckBoxCamera.checked
+
+                // Bind the value of the spin box to the slider value
+                onValueChanged: {
+                    sliderCamera.value = value
+                }
             }
         }
 
