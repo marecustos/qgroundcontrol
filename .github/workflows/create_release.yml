@@ -101,7 +101,7 @@ jobs:
 
             echo "Copy bin"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
-            cp -r "${{ github.workspace }}/seabot_qgc/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
 
             echo "Copy resources"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
