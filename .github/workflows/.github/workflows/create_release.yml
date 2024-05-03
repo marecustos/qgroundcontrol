@@ -93,7 +93,7 @@ jobs:
 
       - name: Create Deb package
         working-directory: ${SOURCE_DIR}
-        run: ./deb_build.sh ;
+        run:  ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
         uses: actions/upload-artifact@master
