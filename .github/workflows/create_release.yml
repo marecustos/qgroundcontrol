@@ -89,7 +89,7 @@ jobs:
 #        run: ${SOURCE_DIR}/deploy/create_linux_appimage.sh ${SOURCE_DIR} ./staging ./package;
 
       - name: Create Deb package
-        working-directory: ${SOURCE_DIR}
+        working-directory: ${{ runner.temp }}/shadow_build_dir
         run: ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
