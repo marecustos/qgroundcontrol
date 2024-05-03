@@ -27,6 +27,7 @@ ApplicationWindow {
     minimumWidth:   ScreenTools.isMobile ? Screen.width  : Math.min(ScreenTools.defaultFontPixelWidth * 100, Screen.width)
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
+    property var payloadWindowObject : null
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -160,7 +161,13 @@ ApplicationWindow {
     }
 
     function showPayloadTool() {
-        showTool(qsTr("Payload"), "Payload.qml", "/qmlimages/robotic_arm.svg")
+        if(payloadWindowObject ===null){
+            payloadWindowObject = payloadWindowComponent.createObject(mainWindow);
+            payloadWindowObject.visible = true;
+        }
+        else{
+            payloadWindowObject.requestActivate()
+        }
     }
 
     function showOlympiosTool() {
@@ -185,6 +192,31 @@ ApplicationWindow {
     // This variant is only meant to be called by QGCApplication
     function _showMessageDialog(dialogTitle, dialogText) {
         showMessageDialog(dialogTitle, dialogText)
+    }
+
+    Component {
+        id: payloadWindowComponent
+
+        Window {
+            id:             payloadWindow
+            visible:        false
+            width: mainWindow.width * 0.7
+            height: mainWindow.height * 0.7
+
+            flags: Qt.Window | Qt.WindowStaysOnTopHint
+
+            onClosing: {
+                payloadWindow.visible = false;
+                payloadLoader.destroy();
+                payloadWindowObject = null
+            }
+
+            Loader {
+                id: payloadLoader
+                anchors.fill: parent
+                source: "Payload.qml" // Path to your payload page QML file
+            }
+        }
     }
 
     Component {

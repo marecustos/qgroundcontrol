@@ -14,7 +14,7 @@ Window {
     height: Screen.height * 0.8
     visible: true
     modality: Qt.NonModal
-    flags: Qt.Window
+    flags: Qt.Window | Qt.WindowStaysOnTopHint
     color: qgcPal.window
     title: "Payload Joystick Settings"
 

@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/QGroundControl
+ExecStop=/usr/bin/killall QGroundControl
 Restart=always
 RestartSec=5
 User=seabot
