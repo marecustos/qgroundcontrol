@@ -183,6 +183,7 @@ ApplicationWindow {
 
     function showPayloadTool() {
         var targetScreenIndex = monitorManager.targetScreenIndexForWindow(mainWindow);
+        if (targetScreenIndex<0)targetScreenIndex=0;
         console.log("target index  ",targetScreenIndex)
         if (payloadWindowObject === null) {
             payloadWindowObject = payloadWindowComponent.createObject(null);
