@@ -111,7 +111,7 @@ jobs:
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
             cp -r "${{ github.workspace }}/resources/icons/qgroundcontrol.png" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
 
-            # Build Debian package
+            echo "Build Debian package"
             pwd
             cd "${{ github.workspace }}/deploy"
             dpkg-deb --build seabot_qgc
