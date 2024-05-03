@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build the package
-. deploy/docker/build-release.sh
+#. deploy/docker/build-release.sh
 
 # Set up variables
 QT_INSTALL_DIR="/opt/Qt"
@@ -18,7 +18,7 @@ sudo chown -R $USER:$USER "$SEABOT_QGC_DIR/opt/Qt"
 # Copy QGroundControl binary
 rm -r "$SEABOT_QGC_DIR/usr/bin"
 mkdir -p "$SEABOT_QGC_DIR/usr/bin"
-cp -r seabot_qgc/QGroundControl "$SEABOT_QGC_DIR/usr/bin"
+cp -r seabot_qgc/staging/QGroundControl "$SEABOT_QGC_DIR/usr/bin"
 
 # Copy resources
 rm -r "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
@@ -31,9 +31,9 @@ mkdir -p "$SEABOT_QGC_DIR/usr/share/pixmaps"
 cp -r resources/icons/qgroundcontrol.png "$SEABOT_QGC_DIR/usr/share/pixmaps"
 
 # Copy libraries
-mkdir -p "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
-cp seabot_qgc/libs/shapelib/libshp.so* "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
-cp seabot_qgc/libs/qmlglsink/libqmlglsink.*so "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+#mkdir -p "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+#cp seabot_qgc/libs/shapelib/libshp.so* "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
+#cp seabot_qgc/libs/qmlglsink/libqmlglsink.*so "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
 
 # Build Debian package
 cd deploy
