@@ -93,7 +93,7 @@ jobs:
 
       - name: Create Deb package
         working-directory: ${{ runner.temp }}/shadow_build_dir
-        run: ${SOURCE_DIR}/deb_build.sh ${SOURCE_DIR} ;
+        run: ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -119,6 +119,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage
-          asset_name: QGroundControl.AppImage
+          asset_path: ${SOURCE_DIR}/seabot_qgc.deb
+          asset_name: seabot_qgc.deb
           asset_content_type: application/octet-stream
