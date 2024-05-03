@@ -22,8 +22,8 @@ mkdir -p "$SEABOT_QGC_DIR/usr/bin"
 cp -r ./seabot_qgc/staging/QGroundControl "$SEABOT_QGC_DIR/usr/bin"
 
 # Copy resources
-rm -r ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
-mkdir -p ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+rm -r "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+mkdir -p "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
 cp -r resources/ "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
 
 # Copy icon
