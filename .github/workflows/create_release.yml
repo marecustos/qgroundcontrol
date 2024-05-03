@@ -39,7 +39,33 @@ jobs:
           dir: ${{ runner.temp }}
           modules: qtcharts qtwebengine
           setup-python: true
+          
+      - name: Create Deb package test
+        working-directory: ${{ github.workspace }}
+        run: |
+            echo "start"
+            ls
+            pwd
 
+            echo "Copy bin"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            cp -r "${{ github.workspace }}/seabot_qgc/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            
+            echo "Copy resources"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+            cp -r "${{ github.workspace }}/resources/" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+            
+            echo "Copy icon"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+            cp -r "${{ github.workspace }}/resources/icons/qgroundcontrol.png" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+            
+            # Build Debian package
+            pwd
+            cd "${{ github.workspace }}/deploy"
+            dpkg-deb --build seabot_qgc
+            cd ..
+            pwd
+  
       - name: Install QGC source dependencies
         run: sudo apt-get install -y libsdl2-dev
 
@@ -93,7 +119,29 @@ jobs:
 
       - name: Create Deb package
         working-directory: ${{ runner.temp }}/shadow_build_dir
-        run:  ${SOURCE_DIR}/deb_build.sh ;
+        run: |
+            echo "start"
+            pwd
+
+            echo "Copy bin"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            cp -r "${{ github.workspace }}/seabot_qgc/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            
+            echo "Copy resources"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+            cp -r "${{ github.workspace }}/resources/" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+            
+            echo "Copy icon"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+            cp -r "${{ github.workspace }}/resources/icons/qgroundcontrol.png" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+            
+            # Build Debian package
+            pwd
+            cd "${{ github.workspace }}/deploy"
+            dpkg-deb --build seabot_qgc
+            cd ..
+            pwd
+
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -123,3 +171,7 @@ jobs:
           asset_path: ${SOURCE_DIR}/deploy/seabot_qgc.deb
           asset_name: seabot_qgc.deb
           asset_content_type: application/octet-stream
+
+
+
+          # Copy QGroundControl binary
