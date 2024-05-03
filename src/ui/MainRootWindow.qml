@@ -19,6 +19,8 @@ import QGroundControl.Controls      1.0
 import QGroundControl.ScreenTools   1.0
 import QGroundControl.FlightDisplay 1.0
 import QGroundControl.FlightMap     1.0
+import QGroundControl.Controllers   1.0
+
 
 /// @brief Native QML top level window
 /// All properties defined here are visible to all QML pages.
@@ -28,6 +30,21 @@ ApplicationWindow {
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
     property var payloadWindowObject : null
+
+    Item {
+        id: windowContent
+        anchors.fill: parent
+        focus: true
+
+        // Install an event filter to handle key events
+        Keys.onPressed: {
+            if (event.key === Qt.Key_P) {
+                showPayloadTool()
+            }
+        }
+
+        // Your existing code...
+    }
 
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
@@ -160,13 +177,23 @@ ApplicationWindow {
         showTool(qsTr("Analyze Tools"), "AnalyzeView.qml", "/qmlimages/Analyze.svg")
     }
 
+    MonitorManager {
+        id: monitorManager
+    }
+
     function showPayloadTool() {
-        if(payloadWindowObject ===null){
-            payloadWindowObject = payloadWindowComponent.createObject(mainWindow);
+        var targetScreenIndex = monitorManager.targetScreenIndexForWindow(mainWindow);
+        console.log("target index  ",targetScreenIndex)
+        if (payloadWindowObject === null) {
+            payloadWindowObject = payloadWindowComponent.createObject(null);
+            payloadWindowObject.visible = false;
+            payloadWindowObject.screen = Qt.application.screens[targetScreenIndex];
+            payloadWindowObject.x = Qt.application.screens[targetScreenIndex].virtualX
+            payloadWindowObject.y = Qt.application.screens[targetScreenIndex].virtualY
+            payloadWindowObject.showMaximized()
             payloadWindowObject.visible = true;
-        }
-        else{
-            payloadWindowObject.requestActivate()
+        } else {
+            payloadWindowObject.requestActivate();
         }
     }
 
@@ -200,8 +227,8 @@ ApplicationWindow {
         Window {
             id:             payloadWindow
             visible:        false
-            width: mainWindow.width * 0.7
-            height: mainWindow.height * 0.7
+            width: mainWindow.width
+            height: mainWindow.height
 
             flags: Qt.Window | Qt.WindowStaysOnTopHint
 
@@ -209,6 +236,7 @@ ApplicationWindow {
                 payloadWindow.visible = false;
                 payloadLoader.destroy();
                 payloadWindowObject = null
+                windowContent.forceActiveFocus()
             }
 
             Loader {
@@ -494,6 +522,9 @@ ApplicationWindow {
                     }
                 }
             }
+            onClosed:{
+                windowContent.forceActiveFocus()
+            }
         }
     }
 
@@ -581,6 +612,7 @@ ApplicationWindow {
                 onClicked: {
                     toolDrawer.visible      = false
                     toolDrawer.toolSource   = ""
+                    windowContent.forceActiveFocus()
                 }
             }
         }

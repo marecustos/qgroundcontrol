@@ -4,6 +4,7 @@
 #include "Vehicle.h"
 #include "MultiVehicleManager.h"
 #include "LinkManager.h"
+#include <QWindow>
 
 QGC_LOGGING_CATEGORY(PayloadControllerLog, "PayloadControllerLog")
 
@@ -248,4 +249,31 @@ void PayloadLogDownloaderThread::run()
             qDebug() << "Error downloading file:" << m_file_name << process.errorString();
         }
     }
+}
+
+MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
+{
+}
+
+int MonitorManager::targetScreenIndexForWindow(QWindow *window)
+{
+    QScreen *currentScreen = window ? window->screen() : nullptr;
+    if (!currentScreen)
+        return -1;
+
+    int targetScreenIndex = findScreenIndexOtherThan(currentScreen->geometry().center());
+    return targetScreenIndex;
+}
+
+int MonitorManager::findScreenIndexOtherThan(const QPoint &currentScreenCenter)
+{
+    QList<QScreen *> screens = QGuiApplication::screens();
+    for (int i = 0; i < screens.size(); ++i)
+    {
+        if (!screens[i]->geometry().contains(currentScreenCenter))
+        {
+            return i;
+        }
+    }
+    return -1;
 }
