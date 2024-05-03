@@ -13,7 +13,7 @@ env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
   ARTIFACT: seabot_qgc.deb
-  BUILD_TYPE: ${{ fromJSON('["DailyBuild", "StableBuild"]')[ github.ref_type == 'tag' || contains(github.ref, 'Stable_' ) ] }}
+  BUILD_TYPE: StableBuild
 
 jobs:
   build:
@@ -92,14 +92,14 @@ jobs:
 
 
       - name: Create Deb package
-        working-directory: ${{ runner.temp }}/shadow_build_dir
+        working-directory: ${SOURCE_DIR}
         run:  ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ runner.temp }}/shadow_build_dir/package/${{ env.ARTIFACT }}
+          path: ${SOURCE_DIR}/${{ env.ARTIFACT }}
 
       - name: Create Release
         id: create_release
@@ -120,6 +120,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${SOURCE_DIR}/seabot_qgc.deb
+          asset_path: ${SOURCE_DIR}/deploy/seabot_qgc.deb
           asset_name: seabot_qgc.deb
           asset_content_type: application/octet-stream

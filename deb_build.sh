@@ -4,8 +4,8 @@
 #. deploy/docker/build-release.sh
 
 # Set up variables
-QT_INSTALL_DIR="/opt/Qt"
-SEABOT_QGC_DIR="deploy/seabot_qgc"
+#QT_INSTALL_DIR="/opt/Qt"
+SEABOT_QGC_DIR="./deploy/seabot_qgc"
 
 # Remove old compiled QGC
 # Comment this out if not needed
@@ -17,19 +17,19 @@ SEABOT_QGC_DIR="deploy/seabot_qgc"
 
 # Copy QGroundControl binary
 pwd
-rm -r ./"$SEABOT_QGC_DIR/usr/bin"
-mkdir -p ./"$SEABOT_QGC_DIR/usr/bin"
+rm -r "$SEABOT_QGC_DIR/usr/bin"
+mkdir -p "$SEABOT_QGC_DIR/usr/bin"
 cp -r ./seabot_qgc/staging/QGroundControl "$SEABOT_QGC_DIR/usr/bin"
 
 # Copy resources
-#rm -r ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
-#mkdir -p ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
-#cp -r resources/ "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+rm -r ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+mkdir -p ./"$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
+cp -r resources/ "$SEABOT_QGC_DIR/usr/share/qgroundcontrol"
 
 # Copy icon
-#rm -r "$SEABOT_QGC_DIR/usr/share/pixmaps"
-#mkdir -p "$SEABOT_QGC_DIR/usr/share/pixmaps"
-#cp -r resources/icons/qgroundcontrol.png "$SEABOT_QGC_DIR/usr/share/pixmaps"
+rm -r "$SEABOT_QGC_DIR/usr/share/pixmaps"
+mkdir -p "$SEABOT_QGC_DIR/usr/share/pixmaps"
+cp -r resources/icons/qgroundcontrol.png "$SEABOT_QGC_DIR/usr/share/pixmaps"
 
 # Copy libraries
 #mkdir -p "$SEABOT_QGC_DIR/lib/x86_64-linux-gnu/"
