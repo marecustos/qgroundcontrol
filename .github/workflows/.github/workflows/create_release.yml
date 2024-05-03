@@ -92,8 +92,8 @@ jobs:
 
 
       - name: Create Deb package
-        working-directory: ${{ runner.temp }}/shadow_build_dir
-        run: ${SOURCE_DIR}/deb_build.sh ;
+        working-directory: ${SOURCE_DIR}
+        run:  ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -103,16 +103,17 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v4.3.0
-          release_name: Seabot_QGC v1.0.0
+          tag: v1.0.1
+          name: Seabot_QGC v1.0.1
           draft: false
           prerelease: false
+          allowUpdates: true
 
-      - name: Upload AppImage
+      - name: Upload Deb 
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
