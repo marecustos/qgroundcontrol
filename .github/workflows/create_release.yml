@@ -12,7 +12,7 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT: QGroundControl.AppImage
+  ARTIFACT: seabot_qgc.deb
   BUILD_TYPE: ${{ fromJSON('["DailyBuild", "StableBuild"]')[ github.ref_type == 'tag' || contains(github.ref, 'Stable_' ) ] }}
 
 jobs:
@@ -113,7 +113,7 @@ jobs:
           prerelease: false
           allowUpdates: true
 
-      - name: Upload Deb 
+      - name: Upload Deb package
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
