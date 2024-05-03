@@ -1,4 +1,4 @@
-name: Create Release with AppImage
+name: Create Deb package Release 
 
 on:
   pull_request:
@@ -92,8 +92,8 @@ jobs:
 
 
       - name: Create Deb package
-        working-directory: ${SOURCE_DIR}
-        run:  deb_build.sh ;
+        working-directory: ${{ runner.temp }}/shadow_build_dir
+        run:  ${SOURCE_DIR}/deb_build.sh ;
 
       - name: Save artifact
         uses: actions/upload-artifact@master
