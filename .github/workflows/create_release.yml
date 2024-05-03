@@ -1,4 +1,4 @@
-name: Create Release with AppImage
+name: Create Deb package Release 
 
 on:
   pull_request:
@@ -12,8 +12,8 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT: QGroundControl.AppImage
-  BUILD_TYPE: ${{ fromJSON('["DailyBuild", "StableBuild"]')[ github.ref_type == 'tag' || contains(github.ref, 'Stable_' ) ] }}
+  ARTIFACT: seabot_qgc.deb
+  BUILD_TYPE: StableBuild
 
 jobs:
   build:
@@ -39,7 +39,8 @@ jobs:
           dir: ${{ runner.temp }}
           modules: qtcharts qtwebengine
           setup-python: true
-
+          
+  
       - name: Install QGC source dependencies
         run: sudo apt-get install -y libsdl2-dev
 
@@ -88,34 +89,65 @@ jobs:
 #        working-directory: ${{ runner.temp }}/shadow_build_dir
 #        run: ${SOURCE_DIR}/deploy/create_linux_appimage.sh ${SOURCE_DIR} ./staging ./package;
 
+
+
+
       - name: Create Deb package
-        working-directory: ${{ runner.temp }}/shadow_build_dir
-        run: ${SOURCE_DIR}/deb_build.sh ;
+        working-directory: ${{ github.workspace }}
+        run: |
+            echo "start"
+            ls
+            pwd
+
+            echo "Copy bin"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+
+            echo "Copy resources"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+            cp -r "${{ github.workspace }}/resources/" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
+
+            echo "Copy icon"
+            mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+            cp -r "${{ github.workspace }}/resources/icons/qgroundcontrol.png" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/pixmaps"
+
+            echo "Build Debian package"
+            pwd
+            cd "${{ github.workspace }}/deploy"
+            dpkg-deb --build seabot_qgc
+            cd ..
+            pwd
+
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ runner.temp }}/shadow_build_dir/package/${{ env.ARTIFACT }}
+          path: ${{ github.workspace }}/deploy/{{ env.ARTIFACT }}
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v4.3.0
-          release_name: Seabot_QGC v1.0.2
+          tag: v1.0.2
+          name: Seabot_QGC v1.0.2
           draft: false
           prerelease: false
+          allowUpdates: true
 
-      - name: Upload deb package
+      - name: Upload Deb package
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${SOURCE_DIR}/seabot_qgc.deb
+          asset_path: ${{ github.workspace }}/deploy/seabot_qgc.deb
           asset_name: seabot_qgc.deb
           asset_content_type: application/octet-stream
+
+
+
+          # Copy QGroundControl binary
