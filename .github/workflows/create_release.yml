@@ -1,4 +1,4 @@
-name: Create Deb package Release 
+name: Create Deb package Release
 
 on:
   pull_request:
@@ -12,7 +12,8 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT: seabot_qgc.deb
+  ARTIFACT_VERSION: 1.0.3
+  ARTIFACT_ARCH: amd64
   BUILD_TYPE: StableBuild
 
 jobs:
@@ -39,8 +40,8 @@ jobs:
           dir: ${{ runner.temp }}
           modules: qtcharts qtwebengine
           setup-python: true
-          
-  
+
+
       - name: Install QGC source dependencies
         run: sudo apt-get install -y libsdl2-dev
 
@@ -79,18 +80,11 @@ jobs:
       - name: Build
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run: |
-          qmake -r ${SOURCE_DIR}/qgroundcontrol.pro CONFIG+=installer CONFIG+=${BUILD_TYPE}
+          qmake -r ${SOURCE_DIR}/qgroundcontrol.pro CONFIG+=${BUILD_TYPE}
           make -j2
 
       - name: ccache post-run
         run: ccache -s
-
-#      - name: Create AppImage
-#        working-directory: ${{ runner.temp }}/shadow_build_dir
-#        run: ${SOURCE_DIR}/deploy/create_linux_appimage.sh ${SOURCE_DIR} ./staging ./package;
-
-
-
 
       - name: Create Deb package
         working-directory: ${{ github.workspace }}
@@ -98,8 +92,10 @@ jobs:
             echo "start"
             ls
             pwd
+            echo "Create Appimage"
+            ${{ github.workspace }}/deploy/create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
 
-            echo "Copy bin"
+            echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
             cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
 
@@ -115,15 +111,20 @@ jobs:
             pwd
             cd "${{ github.workspace }}/deploy"
             dpkg-deb --build seabot_qgc
-            cd ..
+            mv seabot_qgc.deb seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+            echo "renamed seabot_qgc to seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb "
             pwd
 
+      - name: Print asset path and name
+        run: |
+          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          ls ${{ github.workspace }}/deploy/
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ github.workspace }}/deploy/{{ env.ARTIFACT }}
+          name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
 
       - name: Create Release
         id: create_release
@@ -131,11 +132,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: v1.0.2
-          name: Seabot_QGC v1.0.2
+          tag: ${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
+          name: Seabot_QGC ${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
+          bodyFile: body.md
           draft: false
           prerelease: false
           allowUpdates: true
+
+      - name: Print asset path and name
+        run: |
+          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          ls ${{ github.workspace }}/deploy/
+
 
       - name: Upload Deb package
         id: upload-release-asset
@@ -144,10 +152,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/deploy/seabot_qgc.deb
-          asset_name: seabot_qgc.deb
+          asset_path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          asset_name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
           asset_content_type: application/octet-stream
-
-
-
-          # Copy QGroundControl binary
