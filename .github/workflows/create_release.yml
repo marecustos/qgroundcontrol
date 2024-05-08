@@ -111,10 +111,14 @@ jobs:
             pwd
             cd "${{ github.workspace }}/deploy"
             dpkg-deb --build seabot_qgc
-            mv seabot_qgc seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+            mv seabot_qgc.deb seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
             echo "renamed seabot_qgc to seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb "
             pwd
 
+      - name: Print asset path and name
+        run: |
+          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          ls ${{ github.workspace }}/deploy/
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -134,7 +138,7 @@ jobs:
           draft: false
           prerelease: false
           allowUpdates: true
-          
+
       - name: Print asset path and name
         run: |
           ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
