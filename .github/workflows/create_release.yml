@@ -119,8 +119,8 @@ jobs:
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
-          path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
+          name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
 
       - name: Create Release
         id: create_release
@@ -134,6 +134,12 @@ jobs:
           draft: false
           prerelease: false
           allowUpdates: true
+          
+      - name: Print asset path and name
+        run: |
+          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          ls ${{ github.workspace }}/deploy/
+
 
       - name: Upload Deb package
         id: upload-release-asset
