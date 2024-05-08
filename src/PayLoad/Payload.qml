@@ -429,6 +429,7 @@ Rectangle {
                                     color: styleData.textColor
                                     text: model?model.name:null
                                 }
+                                width: tableView.width * 0.5
                             }
 
                             TableViewColumn {

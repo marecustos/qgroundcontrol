@@ -8,11 +8,29 @@
 #include "QGCToolbox.h"
 #include <QThread>
 
+#include <QGuiApplication>
+#include <QScreen>
+
+
 class  MultiVehicleManager;
 class  Vehicle;
 class LinkInterface;
 
 Q_DECLARE_LOGGING_CATEGORY(PayloadControllerLog)
+
+
+class MonitorManager : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit MonitorManager(QObject *parent = nullptr);
+
+    Q_INVOKABLE int targetScreenIndexForWindow(QWindow *window);
+
+private:
+    int findScreenIndexOtherThan(const QPoint &currentScreenCenter);
+};
 
 class PingThread : public QThread
 {
@@ -39,7 +57,7 @@ signals:
 private:
     int m_command ; // 0 for refresh and 1 for Download 
     QString m_host = "seabot-companion.local";
-    QString m_remoteDir = "/home/seabot/logs";//.ros/log
+    QString m_remoteDir = "/home/seabot/seabotxcompanion-ros2/log/";//.ros/log
     QString m_username = "seabot";
     QString m_password = "seabot758400";
     QString m_file_name = "";
