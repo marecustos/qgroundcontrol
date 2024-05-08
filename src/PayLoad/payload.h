@@ -57,7 +57,7 @@ signals:
 private:
     int m_command ; // 0 for refresh and 1 for Download 
     QString m_host = "seabot-companion.local";
-    QString m_remoteDir = "/home/seabot/logs";//.ros/log
+    QString m_remoteDir = "/home/seabot/seabotxcompanion-ros2/log/";//.ros/log
     QString m_username = "seabot";
     QString m_password = "seabot758400";
     QString m_file_name = "";
