@@ -97,7 +97,10 @@ jobs:
 
             echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
-            cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            ls "${{ github.workspace }}/QGroundControl.AppImage"
+            cp "${{ github.workspace }}/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            mv "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl"
+            
 
             echo "Copy resources"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
@@ -114,11 +117,6 @@ jobs:
             mv seabot_qgc.deb seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
             echo "renamed seabot_qgc to seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb "
             pwd
-
-      - name: Print asset path and name
-        run: |
-          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
-          ls ${{ github.workspace }}/deploy/
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -138,11 +136,6 @@ jobs:
           draft: false
           prerelease: false
           allowUpdates: true
-
-      - name: Print asset path and name
-        run: |
-          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
-          ls ${{ github.workspace }}/deploy/
 
 
       - name: Upload Deb package
