@@ -1,4 +1,4 @@
-name: Create Deb package Release 
+name: Create Deb package Release
 
 on:
   pull_request:
@@ -12,7 +12,8 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT: seabot-qgc_1.0.1_amd64.deb
+  ARTIFACT_VERSION: 1.0.1
+  ARTIFACT_ARCH: amd64
   BUILD_TYPE: StableBuild
 
 jobs:
@@ -39,8 +40,8 @@ jobs:
           dir: ${{ runner.temp }}
           modules: qtcharts qtwebengine
           setup-python: true
-          
-  
+
+
       - name: Install QGC source dependencies
         run: sudo apt-get install -y libsdl2-dev
 
@@ -79,7 +80,7 @@ jobs:
       - name: Build
         working-directory: ${{ runner.temp }}/shadow_build_dir
         run: |
-          qmake -r ${SOURCE_DIR}/qgroundcontrol.pro CONFIG+=installer CONFIG+=${BUILD_TYPE}
+          qmake -r ${SOURCE_DIR}/qgroundcontrol.pro CONFIG+=${BUILD_TYPE}
           make -j2
 
       - name: ccache post-run
@@ -91,8 +92,8 @@ jobs:
             echo "start"
             ls
             pwd
-
-            ${{ github.workspace }}/deploy/create_linux_appimage.sh ../ ./staging ./package;
+            echo "Create Appimage"
+            ${{ github.workspace }}/deploy/create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
 
             echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
@@ -110,6 +111,7 @@ jobs:
             pwd
             cd "${{ github.workspace }}/deploy"
             dpkg-deb --build seabot_qgc
+            mv seabot_qgc seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
             cd ..
             pwd
 
@@ -117,7 +119,7 @@ jobs:
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          name: ${{ env.ARTIFACT }}
+          name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
           path: ${{ github.workspace }}/deploy
 
       - name: Create Release
@@ -128,7 +130,7 @@ jobs:
         with:
           tag: v1.0.2
           name: Seabot_QGC v1.0.2
-          #body: 
+          body: body.md
           draft: false
           prerelease: false
           allowUpdates: true
@@ -140,6 +142,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/deploy/seabot_qgc.deb
-          asset_name: seabot_qgc.deb
+          asset_path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
+          asset_name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
           asset_content_type: application/octet-stream
