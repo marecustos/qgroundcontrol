@@ -12,7 +12,7 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT: seabot_qgc.deb
+  ARTIFACT: seabot-qgc_1.0.1_amd64.deb
   BUILD_TYPE: StableBuild
 
 jobs:
@@ -85,13 +85,6 @@ jobs:
       - name: ccache post-run
         run: ccache -s
 
-#      - name: Create AppImage
-#        working-directory: ${{ runner.temp }}/shadow_build_dir
-#        run: ${SOURCE_DIR}/deploy/create_linux_appimage.sh ${SOURCE_DIR} ./staging ./package;
-
-
-
-
       - name: Create Deb package
         working-directory: ${{ github.workspace }}
         run: |
@@ -99,7 +92,9 @@ jobs:
             ls
             pwd
 
-            echo "Copy bin"
+            ${{ github.workspace }}/deploy/create_linux_appimage.sh ../ ./staging ./package;
+
+            echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
             cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
 
@@ -123,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: ${{ env.ARTIFACT }}
-          path: ${{ github.workspace }}/deploy/{{ env.ARTIFACT }}
+          path: ${{ github.workspace }}/deploy
 
       - name: Create Release
         id: create_release
@@ -133,6 +128,7 @@ jobs:
         with:
           tag: v1.0.2
           name: Seabot_QGC v1.0.2
+          #body: 
           draft: false
           prerelease: false
           allowUpdates: true
@@ -147,7 +143,3 @@ jobs:
           asset_path: ${{ github.workspace }}/deploy/seabot_qgc.deb
           asset_name: seabot_qgc.deb
           asset_content_type: application/octet-stream
-
-
-
-          # Copy QGroundControl binary
