@@ -94,7 +94,7 @@ jobs:
             pwd
             echo "Create Appimage"
             ${{ github.workspace }}/deploy/create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
-
+            find / -name QGroundControl.AppImage
             echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
             ls "${{ github.workspace }}/QGroundControl.AppImage"
