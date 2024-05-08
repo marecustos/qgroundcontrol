@@ -120,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
-          path: ${{ github.workspace }}/deploy
+          path: ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
 
       - name: Create Release
         id: create_release
