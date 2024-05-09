@@ -95,14 +95,10 @@ jobs:
             echo "Create Appimage"
             cd ${{ github.workspace }}/deploy
             ./create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
-            echo "deploy content"
-            ls ${{ github.workspace }}/deploy
-            echo "deploy workspace content"
-            ls ${{ github.workspace }}
             echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
-            ls "${{ github.workspace }}/QGroundControl.AppImage"
-            cp "${{ github.workspace }}/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            ls "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage"
+            cp "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
             mv "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl"
             
 
