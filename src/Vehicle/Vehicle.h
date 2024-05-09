@@ -927,7 +927,8 @@ signals:
     void mavlinkMessageReceived         (const mavlink_message_t& message);
     void homePositionChanged            (const QGeoCoordinate& homePosition);
     void payloadStatusChanged           (const mavlink_custom_payload_control_t payloadStatus);
-    void connectedPayloadChanged           (const mavlink_connected_payload_t connectedPayload);
+    void connectedPayloadChanged        (const mavlink_connected_payload_t connectedPayload);
+    void logMessageChanged              (const mavlink_play_tune_v2_t connectedPayload);
     void armedPositionChanged();
     void armedChanged                   (bool armed);
     void flightModeChanged              (const QString& flightMode);
@@ -1071,6 +1072,7 @@ private:
     void _handlePing                    (LinkInterface* link, mavlink_message_t& message);
     void _handlePayloadStatus           (mavlink_message_t& message);
     void _handlePayloadConnected        (mavlink_message_t& message);
+    void _handlePlayTune                (mavlink_message_t& message);
     void _handleHomePosition            (mavlink_message_t& message);
     void _handleHeartbeat               (mavlink_message_t& message);
     void _handleCurrentMode             (mavlink_message_t& message);
