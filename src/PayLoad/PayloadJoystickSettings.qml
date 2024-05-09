@@ -22,7 +22,7 @@ Window {
     property var payloadBoard : ""
     property var  _activeJoystick:          joystickManager.activeJoystick
     property var buttonNames : { 0 : 'A' , 1 : 'B' , 2 :'X' , 3 : 'Y' , 4 : 'Back' , 5 : 'Logitech' , 6 : 'Start' , 7 : 'L3' , 8 : 'R3' , 9 : 'LB' , 10 : 'RB' , 11 : 'UP' , 12 : 'DOWN' , 13:'LEFT' , 14 : 'RIGHT' , 19 : 'LT' , 20 : 'RT'}
-    property var buttonFunctionnalities : payloadBoard == "seabotx"? ["Y Rotation -1", "Docking -1" , "Docking +1", "Y Rotation +1" , "deployTransition +1" , "Light" , "deployTransition -1" , "Prob Z Transition +1" , "Prob Z Transition -1" , "Magnet" , "Brush" , "Prob Y Transition +1" , "Prob Y Transition -1", "Prob X Transition +1" , "Prob X Transition -1" , "Camera Rotation +1" , "Camera Rotation -1"]: payloadBoard=="seaboty" ? ["Y Rotation -1", "" , "", "Y Rotation +1" , "" , "" , "" , "" , "" , "Magnet" , "" , "" , "", "" , "" , "Camera Rotation +1" , "Camera Rotation -1"] : []
+    property var buttonFunctionnalities : payloadBoard == "seabotx"? ["Y Rotation -1", "Docking -1" , "Docking +1", "Y Rotation +1" , "deployTransition +1" , "Light" , "deployTransition -1" , "Prob Z Transition +1" , "Prob Z Transition -1" , "Magnet" , "Brush" , "Prob Y Transition +1" , "Prob Y Transition -1", "Prob X Transition +1" , "Prob X Transition -1" , "Camera Rotation +1" , "Camera Rotation -1"]: payloadBoard=="seaboty" ? ["Y Rotation -1", "" , "", "Y Rotation +1" , "" , "Light" , "" , "" , "" , "Magnet" , "" , "" , "", "" , "" , "Camera Rotation +1" , "Camera Rotation -1"] : []
 
     Connections {
         target: _activeJoystick
