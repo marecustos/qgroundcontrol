@@ -98,7 +98,13 @@ LinuxBuild {
         libQt5XcbQpa.so.5 \
         libQt5Xml.so.5 \
         libicui18n.so* \
-        libQt5TextToSpeech.so.5
+        libQt5TextToSpeech.so.5 \
+        libQt5WebEngineCore.so.5 \
+        libQt5WebEngine.so.5 \
+        libQt5WebEngineWidgets.so.5 \
+        libQt5WebChannel.so.5 \
+        libQt5WebSockets.so.5
+
 
     # Not all Qt libs are built in all systems. CI doesn't build Wayland, for example.
     QT_LIB_OPTIONALS = \
