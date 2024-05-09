@@ -530,7 +530,7 @@ Rectangle {
                                 id: downloadButton
                                 text: qsTr("Download")
                                 width: downloadColumn.width
-                                enabled: tableView.selection.count >0
+                                enabled: tableView.selection.count >0 && downloadToggleButton.text === ("Live Logs")
                                 onClicked: {
                                     fileDialog.title =          qsTr("Select save directory")
                                     fileDialog.selectExisting = true
