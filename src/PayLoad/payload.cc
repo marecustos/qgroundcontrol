@@ -53,6 +53,7 @@ PayloadController::_setActiveVehicle(Vehicle* vehicle)
     _vehicle = vehicle;
     connect(_vehicle, &Vehicle::payloadStatusChanged, this, &PayloadController::handlePayloadStatusChanged);
     connect(_vehicle, &Vehicle::connectedPayloadChanged, this, &PayloadController::handleConnectedPayloadChanged);
+    connect(_vehicle, &Vehicle::logMessageChanged, this, &PayloadController::handleLogMessageChanged);
 }
 
 bool PayloadController::sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message)
@@ -152,6 +153,14 @@ void PayloadController::handleConnectedPayloadChanged(const mavlink_connected_pa
         // Emit the payloadStatusChanged signal to notify QML of the changes
         emit payloadStatusChanged();
     }
+
+}
+
+void PayloadController::handleLogMessageChanged(const mavlink_play_tune_v2_t &loggingMessage)
+{
+    QString logMessage = QString(loggingMessage.tune);
+    qDebug() << logMessage;
+    emit logMessageReceived(logMessage);
 
 }
 
