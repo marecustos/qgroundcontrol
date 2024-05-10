@@ -553,6 +553,12 @@ Rectangle {
                                     close()
                                 }
                             }
+                            
+                            QGCCheckBox{
+                                text: qsTr("Enable Logs")
+                                checked: true
+                                onCheckedChanged: payload_controller.sendControlCommand("enable_logs",checked)
+                            }
                         }
 
                     }
