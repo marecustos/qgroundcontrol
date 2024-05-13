@@ -32,7 +32,7 @@ bash deploy/docker/run.sh
 
 ## Install the .deb package 
 ~~~
-sudo dpkg -i seabot_qgc.deb ; sudo apt install -f -y 
+sudo apt install  ./seabot_qgc*.deb -y  
 ~~~ 
 
 

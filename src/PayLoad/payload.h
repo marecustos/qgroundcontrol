@@ -95,10 +95,12 @@ private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
     void handlePayloadStatusChanged(const mavlink_custom_payload_control_t &payloadStatus);
     void handleConnectedPayloadChanged(const mavlink_connected_payload_t &connectedPayload);
+    void handleLogMessageChanged(const mavlink_play_tune_v2_t &loggingMessage);
 
 signals:
     void payloadStatusChanged();
     void activePayloadNameChanged();
+    void logMessageReceived(const QString& logMessage);
     
 private:
     Vehicle* _vehicle;

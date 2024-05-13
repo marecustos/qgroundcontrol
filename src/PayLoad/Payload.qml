@@ -420,7 +420,8 @@ Rectangle {
                             selectionMode:      SelectionMode.MultiSelection
                             anchors.margins:            ScreenTools.defaultFontPixelWidth*2
                             Layout.preferredWidth: parent.width * 0.9
-                            
+                            visible: downloadToggleButton.text === ("Live Logs")
+                        
 
                             TableViewColumn {
                                 title: qsTr("Name")
@@ -464,9 +465,32 @@ Rectangle {
                             model: ListModel {
                                 id: tableModel
                             }
+                        }
 
-                            onSelectionChanged: {
-                                console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                        Rectangle {
+                            id:                 liveLogs
+                            color:              qgcPal.text
+                            Layout.preferredWidth: parent.width * 0.9
+                            height: parent.height
+                            visible:  downloadToggleButton.text === qsTr("Logs Downloader")
+                            ScrollView {
+                                anchors.fill: parent
+                                id: logScrollView
+
+                                Text {
+                                    id: logText
+                                    text: "Some text here"
+                                    width: parent.width
+                                    color: qgcPal.window
+
+                                    Connections {
+                                        target: payload_controller
+                                        onLogMessageReceived: {
+                                            logText.text += logMessage + "\n";
+                                            logScrollView.flickableItem.contentY = logScrollView.flickableItem.contentHeight - logScrollView.flickableItem.height;
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -477,6 +501,24 @@ Rectangle {
                             anchors.top: parent.top
 
                             QGCButton {
+                                id: downloadToggleButton
+                                text: qsTr("Live Logs")
+                                width: downloadColumn.width
+                                onClicked: {
+                                    if (downloadToggleButton.text === ("Live Logs")) {
+                                        refreshButton.enabled = false;
+                                        logText.text = ""
+                                        downloadToggleButton.text = qsTr("Logs Downloader");
+                                    } else {
+                                        refreshButton.enabled = true;
+                                        logText.text = ""
+                                        downloadToggleButton.text = qsTr("Live Logs");
+                                    }
+                                }
+                            }
+                            
+                            QGCButton {
+                                id: refreshButton
                                 text:       qsTr("Refresh")
                                 width:      downloadColumn.width
                                 onClicked:{
@@ -488,7 +530,7 @@ Rectangle {
                                 id: downloadButton
                                 text: qsTr("Download")
                                 width: downloadColumn.width
-                                enabled: tableView.selection.count >0
+                                enabled: tableView.selection.count >0 && downloadToggleButton.text === ("Live Logs")
                                 onClicked: {
                                     fileDialog.title =          qsTr("Select save directory")
                                     fileDialog.selectExisting = true
@@ -519,4 +561,5 @@ Rectangle {
             }
         }
     }
+
 }
