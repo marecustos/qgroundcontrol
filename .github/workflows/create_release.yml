@@ -93,11 +93,14 @@ jobs:
             ls
             pwd
             echo "Create Appimage"
-            ${{ github.workspace }}/deploy/create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
-
+            cd ${{ github.workspace }}/deploy
+            ./create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
             echo "Copy Appimage"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
-            cp -r "${{ runner.temp }}/shadow_build_dir/staging/QGroundControl" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            ls "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage"
+            cp "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
+            mv "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl"
+            
 
             echo "Copy resources"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
@@ -114,11 +117,6 @@ jobs:
             mv seabot_qgc.deb seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
             echo "renamed seabot_qgc to seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb "
             pwd
-
-      - name: Print asset path and name
-        run: |
-          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
-          ls ${{ github.workspace }}/deploy/
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -138,11 +136,6 @@ jobs:
           draft: false
           prerelease: false
           allowUpdates: true
-
-      - name: Print asset path and name
-        run: |
-          ls ${{ github.workspace }}/deploy/seabot-qgc_${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}.deb
-          ls ${{ github.workspace }}/deploy/
 
 
       - name: Upload Deb package

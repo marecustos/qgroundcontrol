@@ -4,6 +4,7 @@
 #include "Vehicle.h"
 #include "MultiVehicleManager.h"
 #include "LinkManager.h"
+#include <QWindow>
 
 QGC_LOGGING_CATEGORY(PayloadControllerLog, "PayloadControllerLog")
 
@@ -52,6 +53,7 @@ PayloadController::_setActiveVehicle(Vehicle* vehicle)
     _vehicle = vehicle;
     connect(_vehicle, &Vehicle::payloadStatusChanged, this, &PayloadController::handlePayloadStatusChanged);
     connect(_vehicle, &Vehicle::connectedPayloadChanged, this, &PayloadController::handleConnectedPayloadChanged);
+    connect(_vehicle, &Vehicle::logMessageChanged, this, &PayloadController::handleLogMessageChanged);
 }
 
 bool PayloadController::sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message)
@@ -154,6 +156,14 @@ void PayloadController::handleConnectedPayloadChanged(const mavlink_connected_pa
 
 }
 
+void PayloadController::handleLogMessageChanged(const mavlink_play_tune_v2_t &loggingMessage)
+{
+    QString logMessage = QString(loggingMessage.tune);
+    qDebug() << logMessage;
+    emit logMessageReceived(logMessage);
+
+}
+
 PayloadLogDownloader::PayloadLogDownloader(void)
 {
     qDebug()<<"Payload Log Downloader initialized";
@@ -187,12 +197,11 @@ void PayloadLogDownloaderThread::run()
 {
     qDebug()<<"running with command "<<m_command;
     if (m_command == 0) {
-
         QStringList logs;
         // Execute refresh command
         QProcess process;
         QStringList args;
-        args << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << "-l" << m_username << m_host << "ls -l" << m_remoteDir;
+        args << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << "-l" << m_username << m_host << "find" << m_remoteDir << "-type" << "f" << "-exec" << "ls" << "-l" << "{}" << "+";
 
         process.start("sshpass", args);
         process.waitForFinished();
@@ -222,8 +231,8 @@ void PayloadLogDownloaderThread::run()
                             unit = "B";
                         }
 
-                        QString fileInfo = parts.last() + "//" + parts[5] + " " + parts[6] + " " + parts[7] + "//" + size + unit;
-                        // Emit signal or handle fileInfo as needed
+                        QString fileName = parts.last(); // Get the file name
+                        QString fileInfo = fileName.mid(m_remoteDir.length()) + "//" + parts[5] + " " + parts[6] + " " + parts[7] + "//" + size + unit;
                         logs.append(fileInfo);
                     }
                 }
@@ -232,7 +241,8 @@ void PayloadLogDownloaderThread::run()
             qDebug() << "Error executing SSH command:" << process.errorString();
         }
         emit filesRefreshed(logs);
-    } else if (m_command == 1) {
+    }
+    else if (m_command == 1) {
         // Execute download command
         // Implement download logic here
         QProcess process;
@@ -248,4 +258,31 @@ void PayloadLogDownloaderThread::run()
             qDebug() << "Error downloading file:" << m_file_name << process.errorString();
         }
     }
+}
+
+MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
+{
+}
+
+int MonitorManager::targetScreenIndexForWindow(QWindow *window)
+{
+    QScreen *currentScreen = window ? window->screen() : nullptr;
+    if (!currentScreen)
+        return -1;
+
+    int targetScreenIndex = findScreenIndexOtherThan(currentScreen->geometry().center());
+    return targetScreenIndex;
+}
+
+int MonitorManager::findScreenIndexOtherThan(const QPoint &currentScreenCenter)
+{
+    QList<QScreen *> screens = QGuiApplication::screens();
+    for (int i = 0; i < screens.size(); ++i)
+    {
+        if (!screens[i]->geometry().contains(currentScreenCenter))
+        {
+            return i;
+        }
+    }
+    return -1;
 }
