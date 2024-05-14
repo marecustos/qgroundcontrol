@@ -52,6 +52,20 @@ Rectangle {
         }
     }
 
+    SeabotVersionning{
+        id : seabotVersion
+        Component.onCompleted:{
+            seabotVersion.getQGCVersion()
+            seabotVersion.getCompanionVersion()
+        }
+        onQgcVersion:{
+            qgcVersionLabel.text = version
+        }
+        onCompanionVersion:{
+            companionVerionLabel.text = version
+        }
+    }
+
     Component.onCompleted:{
         console.log("payload loaded")
         _activeJoystick.setInPayloadPage(true)
@@ -323,6 +337,22 @@ Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 QGCLabel {
                                     width:              _labelWidth
+                                    text:               qsTr("QGC Version                                            : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    id: qgcVersionLabel
+                                    width:              _valueWidth
+                                    text:               ""
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
                                     text:               qsTr("Companion Memory Usage                  : ")
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -371,8 +401,9 @@ Rectangle {
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 QGCLabel {
+                                    id: companionVerionLabel
                                     width:              _valueWidth
-                                    text:               payload_controller.payloadStatus.companion_soft_version
+                                    text:               ""
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }

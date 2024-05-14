@@ -260,6 +260,66 @@ void PayloadLogDownloaderThread::run()
     }
 }
 
+SeabotVersionningThread::SeabotVersionningThread(int command, QObject *parent)
+    : QThread(parent), m_command(command)
+{
+    qDebug()<<"SeabotVersionningThread initialized";
+}
+
+void SeabotVersionningThread::run()
+{
+    if (m_command == 0) {
+        QProcess process;
+        process.start("dpkg-query", QStringList() << "-f" << "${Version}" << "-W" << "seabot-qgc");
+        if (!process.waitForFinished()) {
+            // Failed to execute the command
+            emit qgcVersion("");
+        } else {
+            QByteArray output = process.readAllStandardOutput();
+            QString version = QString::fromLatin1(output).trimmed();
+            emit qgcVersion(version);
+        }
+    }
+
+    else if (m_command == 1) {
+        // Execute command to get companion version
+        QProcess process;
+        QStringList args;
+        args << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << m_username + "@" + m_host << "dpkg-query -f '${Version}' -W seabotxcompanion-ros2";
+
+        process.start("sshpass", args);
+        process.waitForFinished();
+
+        if (process.exitCode() == 0) {
+            QByteArray output = process.readAllStandardOutput();
+            QString version = QString::fromLatin1(output).trimmed();
+            qDebug() << "Companion version:" << version;
+            emit companionVersion(version);
+        } else {
+            qDebug() << "Error getting companion version:" << process.errorString();
+        }
+    }
+}
+
+SeabotVersionning::SeabotVersionning(void)
+{
+    qDebug()<<"Seabot Versionning initialized";
+}
+
+void SeabotVersionning::getQGCVersion(void)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(0);
+    connect(thread, &SeabotVersionningThread::qgcVersion, this, &SeabotVersionning::qgcVersion);
+    thread->start();
+}
+
+void SeabotVersionning::getCompanionVersion(void)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(1);
+    connect(thread, &SeabotVersionningThread::companionVersion, this, &SeabotVersionning::companionVersion);
+    thread->start();
+}
+
 MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
 {
 }
