@@ -75,6 +75,34 @@ public:
 signals:
     void filesRefreshed(QStringList files);
 };
+class SeabotVersionningThread : public QThread
+{
+    Q_OBJECT
+public:
+    explicit SeabotVersionningThread(int command, QObject *parent = nullptr);
+    void run() override;
+signals:
+    void qgcVersion(QString version);
+    void companionVersion(QString version);
+private:
+    int m_command ;
+    QString m_host = "seabot-companion.local";
+    QString m_username = "seabot";
+    QString m_password = "seabot758400";
+};
+
+class SeabotVersionning : public QObject
+{
+    Q_OBJECT
+
+public:
+    SeabotVersionning(void);
+    Q_INVOKABLE void getQGCVersion();
+    Q_INVOKABLE void getCompanionVersion();
+signals:
+    void qgcVersion(QString version);
+    void companionVersion(QString version);
+};
 
 class PayloadController : public QObject
 {
