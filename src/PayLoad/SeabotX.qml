@@ -18,7 +18,7 @@ Rectangle {
     anchors.horizontalCenter: parent.horizontalCenter
     focus: true // Ensure this item can receive focus
     property var buttonMap: {"0": yRotationB ,3: yRotationF, 2: dockingF, 1: dockingB, 4: deploymentTransF, 6: deploymentTransB, 13: probXTransitionF, 14: probXTransitionB, 11: probYTransitionF, 12: probYTransitionB, 7: probZTransitionF, 8: probZTransitionB , 20 : cameraRotationRelativeB , 19 : cameraRotationRelativeF}
-    property var switches : {9:magnetSwitch , 10 : gripperSwitch , 5: lightSwitch}
+    property var switches : {9:magnetSwitch , 10 : gripperSwitch }
 
 
 
@@ -382,6 +382,43 @@ Rectangle {
         }
 
         Row {
+            spacing:    ScreenTools.defaultFontPixelWidth
+
+            QGCLabel {
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("Light                                             ")
+            }
+            ControlButton {
+                id : lightF
+                targetCommand: "light"
+                valueCommand: +1
+                onControlButtonPressed: {
+                    payload_controller.sendControlCommand(targetCommand,valueCommand)
+                }
+
+            }
+            ControlButton {
+                id : lightB
+                targetCommand: "light"
+                valueCommand: -1
+                onControlButtonPressed: {
+                    payload_controller.sendControlCommand(targetCommand,valueCommand)
+                }
+
+            }
+            QGCTextField {
+                id: lightValueLabel
+                readOnly : true
+                width : status_width
+                anchors.verticalCenter: parent.verticalCenter
+                font.pointSize: ScreenTools.largeFontPointSize
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: TextInput.AlignVCenter
+                text: payload_controller.payloadStatus.light.toString()
+            }
+        }
+
+        Row {
             spacing: ScreenTools.defaultFontPixelWidth
 
             QGCLabel {
@@ -423,27 +460,6 @@ Rectangle {
                 }
             }
         }
-
-        Row {
-            spacing: ScreenTools.defaultFontPixelWidth
-
-            QGCLabel {
-                anchors.verticalCenter: parent.verticalCenter
-                text:  qsTr("Light                                               ")
-            }
-
-            Switch {
-                id: lightSwitch
-                onClicked: {
-                    if (!checked) {
-                        payload_controller.sendControlCommand("light",0)
-                    }
-                    else {
-                        payload_controller.sendControlCommand("light",1)
-                    }
-                }
-            }
-        } 
 
         
     }
