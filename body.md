@@ -39,6 +39,7 @@
 # Changes
 
 - Updated dependencies to improve performance and compatibility.
+- added installation of qt5 
 
 # Installation
 
@@ -62,21 +63,8 @@
 
 # Changelog
 
-- Detailed changelog can be found [here](https://github.com/marecustos/qgroundcontrol/commits/seabot_qgc_v1.0.0).
+- Detailed changelog can be found [here](https://github.com/marecustos/qgroundcontrol/commits/seabot_qgc_v1.0.5).
 
-# What's Changed
-- Seabot stable v4.3 dev mahmoud by @MblRobotics in [#1](https://github.com/marecustos/qgroundcontrol/pull/1)
-- Workflow for Seabot qgc by @offgrid88 in [#3](https://github.com/marecustos/qgroundcontrol/pull/3)
-- Update ubuntu-20.04-workflow.yml by @offgrid88 in [#4](https://github.com/marecustos/qgroundcontrol/pull/4)
-- Seabot stable v4.3 dev mahmoud by @MblRobotics in [#5](https://github.com/marecustos/qgroundcontrol/pull/5)
-- Added webengine to docker build by @offgrid88 in [#6](https://github.com/marecustos/qgroundcontrol/pull/6)
-- Fixing dependencies for webengine by @offgrid88 in [#7](https://github.com/marecustos/qgroundcontrol/pull/7)
-- Fixing workflow build by @offgrid88 in [#8](https://github.com/marecustos/qgroundcontrol/pull/8)
-- QGC config persistence inside container by @offgrid88 in [#9](https://github.com/marecustos/qgroundcontrol/pull/9)
-- Implement new Payload control GUI and use direct Mavlink messages by @MblRobotics in [#10](https://github.com/marecustos/qgroundcontrol/pull/10)
-- Sync PR Seabot stable v4.3 dev aymen by @offgrid88 in [#11](https://github.com/marecustos/qgroundcontrol/pull/11)
-- Seabot stable v4.3 dev mahmoud by @MblRobotics in [#12](https://github.com/marecustos/qgroundcontrol/pull/12)
-- Seabot stable v4.3 dev aymen by @offgrid88 in [#13](https://github.com/marecustos/qgroundcontrol/pull/13)
 
 # New Contributors
 - @MblRobotics made their first contribution in [#1](https://github.com/marecustos/qgroundcontrol/pull/1)
