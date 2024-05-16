@@ -266,6 +266,13 @@ SeabotVersionningThread::SeabotVersionningThread(int command, QObject *parent)
     qDebug()<<"SeabotVersionningThread initialized";
 }
 
+SeabotVersionningThread::SeabotVersionningThread(int command, QString debFilePath,  QObject *parent)
+    : QThread(parent), m_command(command), m_deb_file_path(debFilePath)
+{
+    qDebug()<<"SeabotVersionningThread initialized";
+}
+
+
 void SeabotVersionningThread::run()
 {
     if (m_command == 0) {
@@ -299,6 +306,42 @@ void SeabotVersionningThread::run()
             qDebug() << "Error getting companion version:" << process.errorString();
         }
     }
+    else if (m_command == 2){
+        // Copy the .deb file to Nvidia device's temporary directory
+        QProcess scpProcess;
+        QStringList scpArgs;
+        scpArgs << "-p" << m_password << "scp" << m_deb_file_path << "seabot@seabot-companion.local:/tmp/";
+
+        scpProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        scpProcess.start("sshpass", scpArgs);
+        scpProcess.waitForFinished();
+
+        if (scpProcess.exitCode() != 0) {
+            QString errorOutput = scpProcess.readAll();
+            emit installationComplete(false, "Failed to copy .deb file to Nvidia device. Error: " + errorOutput);
+            return;
+        }
+
+
+        // Install the .deb package
+        QProcess installProcess;
+        QStringList installArgs;
+        qDebug()<<"QFileInfo(m_deb_file_path).fileName() "<<QFileInfo(m_deb_file_path).fileName();
+        installArgs << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << m_username + "@" + m_host;
+        installArgs << "sudo" << "apt" << "install" << "/tmp/" + QFileInfo(m_deb_file_path).fileName();
+
+        installProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        installProcess.start("sshpass", installArgs);
+        installProcess.waitForFinished(-1);
+
+        QString output = installProcess.readAll();
+        if (output.contains("debian package is installed successfully") || output.contains("is already the newest version")) {
+            emit installationComplete(true, "Installation successful");
+        } else {
+            emit installationComplete(false, "Failed to install .deb package on Nvidia device. Error: " + output);
+        }
+
+    }
 }
 
 SeabotVersionning::SeabotVersionning(void)
@@ -320,6 +363,12 @@ void SeabotVersionning::getCompanionVersion(void)
     thread->start();
 }
 
+void SeabotVersionning::installDebPackage(const QString& debFilePath)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(2, debFilePath);
+    connect(thread, &SeabotVersionningThread::installationComplete, this, &SeabotVersionning::installationComplete);
+    thread->start();
+}
 MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
 {
 }
