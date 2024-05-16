@@ -1,5 +1,6 @@
 #!/bin/sh
-LD_LIBRARY_PATH=/opt/Qt/5.15.2/gcc_64/lib
+export PATH=/opt/Qt/5.15.2/gcc_64/bin/:$PATH
+echo $PATH
 HERE="$(dirname "$(readlink -f "${0}")")"
 
 # hack until icon issue with AppImage is resolved

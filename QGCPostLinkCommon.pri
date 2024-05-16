@@ -64,7 +64,8 @@ WindowsBuild {
 }
 
 LinuxBuild {
-    QMAKE_POST_LINK += && mkdir -p $$DESTDIR/Qt/libs && mkdir -p $$DESTDIR/Qt/plugins
+    QMAKE_POST_LINK += && mkdir -p $$DESTDIR/Qt/libs && mkdir -p $$DESTDIR/Qt/plugins && mkdir -p $$DESTDIR/Qt/libexec
+    
     QMAKE_RPATHDIR += $ORIGIN/Qt/libs
 
     # QT_INSTALL_LIBS
@@ -169,4 +170,7 @@ LinuxBuild {
 
     # https://doc.qt.io/qt-5/qt-conf.html
     QMAKE_POST_LINK += && $$QMAKE_COPY "$$SOURCE_DIR/deploy/qt.conf" "$$DESTDIR"
+    # Copy QtWebEngineProcess executable
+    #QMAKE_POST_LINK += && $$QMAKE_COPY "$$[QT_INSTALL_LIBS]/../libexec/* $$DESTDIR/Qt/libexec
+    QMAKE_POST_LINK += && $$QMAKE_COPY $$[QT_INSTALL_PREFIX]/libexec/QtWebEngineProcess $$DESTDIR/Qt/libexec
 }
