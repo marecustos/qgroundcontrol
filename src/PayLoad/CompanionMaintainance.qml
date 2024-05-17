@@ -20,6 +20,8 @@ SetupPage{
         onInstallationComplete:{
             console.log("success ",success)
             console.log("message here    ",message)
+            mainWindow.showMessageDialog(success? qsTr("Installation successful") : qsTr("Installation Failed"),qsTr(message) )
+            seabotVersion.getCompanionVersion()
         }
     }
 

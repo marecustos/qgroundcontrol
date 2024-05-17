@@ -103,10 +103,13 @@ public:
     Q_INVOKABLE void getQGCVersion();
     Q_INVOKABLE void getCompanionVersion();
     Q_INVOKABLE void installDebPackage(const QString& debFilePath);
+    static void broadcastCompanionVersion(QString version);
 signals:
     void qgcVersion(QString version);
     void companionVersion(QString version);
     void installationComplete(bool success, QString message);
+private:
+    static QList<SeabotVersionning*> instances;
 };
 
 class PayloadController : public QObject

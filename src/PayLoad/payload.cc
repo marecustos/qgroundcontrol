@@ -301,7 +301,7 @@ void SeabotVersionningThread::run()
             QByteArray output = process.readAllStandardOutput();
             QString version = QString::fromLatin1(output).trimmed();
             qDebug() << "Companion version:" << version;
-            emit companionVersion(version);
+            SeabotVersionning::broadcastCompanionVersion(version); 
         } else {
             qDebug() << "Error getting companion version:" << process.errorString();
         }
@@ -322,6 +322,27 @@ void SeabotVersionningThread::run()
             return;
         }
 
+        //check successful copying
+        QProcess checkFileProcess;
+        QStringList checkFileArgs;
+        checkFileArgs << "-p" << m_password << "ssh" << m_username + "@" + m_host << "ls" << "/tmp/" + QFileInfo(m_deb_file_path).fileName();
+
+        checkFileProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        checkFileProcess.start("sshpass", checkFileArgs);
+        checkFileProcess.waitForFinished();
+
+        if (checkFileProcess.exitCode() != 0) {
+            QString errorOutput = checkFileProcess.readAll();
+            emit installationComplete(false, "Failed to check if the file exists on Nvidia device. Error: " + errorOutput);
+            return;
+        }
+
+        QString checkFileOutput = checkFileProcess.readAllStandardOutput();
+        if (checkFileOutput.trimmed().isEmpty()) {
+            emit installationComplete(false, "File not copied to Nvidia device. ");
+            return;
+        }
+
 
         // Install the .deb package
         QProcess installProcess;
@@ -336,17 +357,27 @@ void SeabotVersionningThread::run()
 
         QString output = installProcess.readAll();
         if (output.contains("debian package is installed successfully") || output.contains("is already the newest version")) {
-            emit installationComplete(true, "Installation successful");
+            emit installationComplete(true, "debian package is installed successfully");
         } else {
             emit installationComplete(false, "Failed to install .deb package on Nvidia device. Error: " + output);
         }
 
     }
 }
+QList<SeabotVersionning*> SeabotVersionning::instances;
 
 SeabotVersionning::SeabotVersionning(void)
 {
+    instances.append(this); // Add the current instance to the list
     qDebug()<<"Seabot Versionning initialized";
+}
+
+void SeabotVersionning::broadcastCompanionVersion(QString version)
+{
+    for (SeabotVersionning* instance : instances)
+    {
+        instance->companionVersion(version); // Emit the companionVersion signal for each instance
+    }
 }
 
 void SeabotVersionning::getQGCVersion(void)
