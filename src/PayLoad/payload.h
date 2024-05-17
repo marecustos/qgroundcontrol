@@ -100,6 +100,7 @@ class SeabotVersionning : public QObject
 
 public:
     SeabotVersionning(void);
+    ~SeabotVersionning(); 
     Q_INVOKABLE void getQGCVersion();
     Q_INVOKABLE void getCompanionVersion();
     Q_INVOKABLE void installDebPackage(const QString& debFilePath);

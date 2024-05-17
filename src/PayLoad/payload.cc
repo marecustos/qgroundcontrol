@@ -372,6 +372,12 @@ SeabotVersionning::SeabotVersionning(void)
     qDebug()<<"Seabot Versionning initialized";
 }
 
+SeabotVersionning::~SeabotVersionning()
+{
+    instances.removeAll(this); // Remove the current instance from the list
+    qDebug() << "Seabot Versionning destroyed";
+}
+
 void SeabotVersionning::broadcastCompanionVersion(QString version)
 {
     for (SeabotVersionning* instance : instances)
