@@ -80,15 +80,18 @@ class SeabotVersionningThread : public QThread
     Q_OBJECT
 public:
     explicit SeabotVersionningThread(int command, QObject *parent = nullptr);
+    explicit SeabotVersionningThread(int command,QString debFilePath, QObject *parent = nullptr);
     void run() override;
 signals:
     void qgcVersion(QString version);
     void companionVersion(QString version);
+    void installationComplete(bool success, QString message);
 private:
     int m_command ;
     QString m_host = "seabot-companion.local";
     QString m_username = "seabot";
     QString m_password = "seabot758400";
+    QString m_deb_file_path ="";
 };
 
 class SeabotVersionning : public QObject
@@ -99,9 +102,11 @@ public:
     SeabotVersionning(void);
     Q_INVOKABLE void getQGCVersion();
     Q_INVOKABLE void getCompanionVersion();
+    Q_INVOKABLE void installDebPackage(const QString& debFilePath);
 signals:
     void qgcVersion(QString version);
     void companionVersion(QString version);
+    void installationComplete(bool success, QString message);
 };
 
 class PayloadController : public QObject
