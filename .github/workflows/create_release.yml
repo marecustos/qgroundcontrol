@@ -1,7 +1,7 @@
 name: Create Deb package Release
 
 on:
-  pull_request:
+  push:
     branches:
       - 'release/*'
 
@@ -40,7 +40,6 @@ jobs:
           dir: ${{ runner.temp }}
           modules: qtcharts qtwebengine
           setup-python: true
-
 
       - name: Install QGC source dependencies
         run: sudo apt-get install -y libsdl2-dev
@@ -101,7 +100,6 @@ jobs:
             cp "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin"
             mv "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl.AppImage" "${{ github.workspace }}/deploy/seabot_qgc/usr/bin/QGroundControl"
             
-
             echo "Copy resources"
             mkdir -p "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
             cp -r "${{ github.workspace }}/resources/" "${{ github.workspace }}/deploy/seabot_qgc/usr/share/qgroundcontrol"
@@ -136,7 +134,6 @@ jobs:
           draft: false
           prerelease: false
           allowUpdates: true
-
 
       - name: Upload Deb package
         id: upload-release-asset
