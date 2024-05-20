@@ -260,6 +260,152 @@ void PayloadLogDownloaderThread::run()
     }
 }
 
+SeabotVersionningThread::SeabotVersionningThread(int command, QObject *parent)
+    : QThread(parent), m_command(command)
+{
+    qDebug()<<"SeabotVersionningThread initialized";
+}
+
+SeabotVersionningThread::SeabotVersionningThread(int command, QString debFilePath,  QObject *parent)
+    : QThread(parent), m_command(command), m_deb_file_path(debFilePath)
+{
+    qDebug()<<"SeabotVersionningThread initialized";
+}
+
+
+void SeabotVersionningThread::run()
+{
+    if (m_command == 0) {
+        QProcess process;
+        process.start("dpkg-query", QStringList() << "-f" << "${Version}" << "-W" << "seabot-qgc");
+        if (!process.waitForFinished()) {
+            // Failed to execute the command
+            emit qgcVersion("");
+        } else {
+            QByteArray output = process.readAllStandardOutput();
+            QString version = QString::fromLatin1(output).trimmed();
+            emit qgcVersion(version);
+        }
+    }
+
+    else if (m_command == 1) {
+        // Execute command to get companion version
+        QProcess process;
+        QStringList args;
+        args << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << m_username + "@" + m_host << "dpkg-query -f '${Version}' -W seabotxcompanion-ros2";
+
+        process.start("sshpass", args);
+        process.waitForFinished();
+
+        if (process.exitCode() == 0) {
+            QByteArray output = process.readAllStandardOutput();
+            QString version = QString::fromLatin1(output).trimmed();
+            qDebug() << "Companion version:" << version;
+            SeabotVersionning::broadcastCompanionVersion(version); 
+        } else {
+            qDebug() << "Error getting companion version:" << process.errorString();
+        }
+    }
+    else if (m_command == 2){
+        // Copy the .deb file to Nvidia device's temporary directory
+        QProcess scpProcess;
+        QStringList scpArgs;
+        scpArgs << "-p" << m_password << "scp" << m_deb_file_path << "seabot@seabot-companion.local:/tmp/";
+
+        scpProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        scpProcess.start("sshpass", scpArgs);
+        scpProcess.waitForFinished();
+
+        if (scpProcess.exitCode() != 0) {
+            QString errorOutput = scpProcess.readAll();
+            emit installationComplete(false, "Failed to copy .deb file to Nvidia device. Error: " + errorOutput);
+            return;
+        }
+
+        //check successful copying
+        QProcess checkFileProcess;
+        QStringList checkFileArgs;
+        checkFileArgs << "-p" << m_password << "ssh" << m_username + "@" + m_host << "ls" << "/tmp/" + QFileInfo(m_deb_file_path).fileName();
+
+        checkFileProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        checkFileProcess.start("sshpass", checkFileArgs);
+        checkFileProcess.waitForFinished();
+
+        if (checkFileProcess.exitCode() != 0) {
+            QString errorOutput = checkFileProcess.readAll();
+            emit installationComplete(false, "Failed to check if the file exists on Nvidia device. Error: " + errorOutput);
+            return;
+        }
+
+        QString checkFileOutput = checkFileProcess.readAllStandardOutput();
+        if (checkFileOutput.trimmed().isEmpty()) {
+            emit installationComplete(false, "File not copied to Nvidia device. ");
+            return;
+        }
+
+
+        // Install the .deb package
+        QProcess installProcess;
+        QStringList installArgs;
+        qDebug()<<"QFileInfo(m_deb_file_path).fileName() "<<QFileInfo(m_deb_file_path).fileName();
+        installArgs << "-p" << m_password << "ssh" << "-oStrictHostKeyChecking=no" << "-oUserKnownHostsFile=/dev/null" << m_username + "@" + m_host;
+        installArgs << "sudo" << "apt" << "install" << "/tmp/" + QFileInfo(m_deb_file_path).fileName();
+
+        installProcess.setProcessChannelMode(QProcess::MergedChannels); // Merge standard output and standard error
+        installProcess.start("sshpass", installArgs);
+        installProcess.waitForFinished(-1);
+
+        QString output = installProcess.readAll();
+        if (output.contains("debian package is installed successfully") || output.contains("is already the newest version")) {
+            emit installationComplete(true, "debian package is installed successfully");
+        } else {
+            emit installationComplete(false, "Failed to install .deb package on Nvidia device. Error: " + output);
+        }
+
+    }
+}
+QList<SeabotVersionning*> SeabotVersionning::instances;
+
+SeabotVersionning::SeabotVersionning(void)
+{
+    instances.append(this); // Add the current instance to the list
+    qDebug()<<"Seabot Versionning initialized";
+}
+
+SeabotVersionning::~SeabotVersionning()
+{
+    instances.removeAll(this); // Remove the current instance from the list
+    qDebug() << "Seabot Versionning destroyed";
+}
+
+void SeabotVersionning::broadcastCompanionVersion(QString version)
+{
+    for (SeabotVersionning* instance : instances)
+    {
+        instance->companionVersion(version); // Emit the companionVersion signal for each instance
+    }
+}
+
+void SeabotVersionning::getQGCVersion(void)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(0);
+    connect(thread, &SeabotVersionningThread::qgcVersion, this, &SeabotVersionning::qgcVersion);
+    thread->start();
+}
+
+void SeabotVersionning::getCompanionVersion(void)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(1);
+    connect(thread, &SeabotVersionningThread::companionVersion, this, &SeabotVersionning::companionVersion);
+    thread->start();
+}
+
+void SeabotVersionning::installDebPackage(const QString& debFilePath)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(2, debFilePath);
+    connect(thread, &SeabotVersionningThread::installationComplete, this, &SeabotVersionning::installationComplete);
+    thread->start();
+}
 MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
 {
 }

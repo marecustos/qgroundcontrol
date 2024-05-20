@@ -290,6 +290,7 @@
         <file alias="QGroundControl/Controls/MockLinkOptionsDlg.qml">src/comm/MockLinkOptionsDlg.qml</file>
         <file alias="QGroundControl/FlightDisplay/FlyViewInsetViewer.qml">src/FlightDisplay/FlyViewInsetViewer.qml</file>
         <file alias="Payload.qml">src/PayLoad/Payload.qml</file>
+        <file alias="CompanionMaintainance.qml">src/PayLoad/CompanionMaintainance.qml</file>
         <file alias="olympios.qml">src/PayLoad/olympios.qml</file>
         <file alias="PayloadJoystickSettings.qml">src/PayLoad/PayloadJoystickSettings.qml</file>
         <file alias="ControlButton.qml">src/PayLoad/ControlButton.qml</file>

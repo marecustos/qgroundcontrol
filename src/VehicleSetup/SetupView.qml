@@ -46,6 +46,14 @@ Rectangle {
         _showSummaryPanel()
     }
 
+    function showMaintainanceTool() {
+        if (mainWindow.preventViewSwitch()) {
+            return
+        }
+        panelLoader.setSource("CompanionMaintainance.qml")
+        companionMaintainanceButton.checked = true
+    }
+
     function _showSummaryPanel() {
         if (_fullParameterVehicleAvailable) {
             if (QGroundControl.multiVehicleManager.activeVehicle.autopilot.vehicleComponents.length === 0) {
@@ -232,6 +240,17 @@ Rectangle {
                 Layout.fillWidth:   true
 
                 onClicked: showSummaryPanel()
+            }
+
+            SubMenuButton {
+                id:                 companionMaintainanceButton
+                imageResource:      "/qmlimages/companionMaintainance.png"
+                setupIndicator:     false
+                exclusiveGroup:     setupButtonGroup
+                text:               qsTr("Companion Maintainance")
+                Layout.fillWidth:   true
+
+                onClicked: showMaintainanceTool()
             }
 
             SubMenuButton {
