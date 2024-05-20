@@ -8,13 +8,14 @@
 #copying host 
     cp /etc/hosts /etc/hosts.bak
     cp /home/hosts /etc
-    cp /home/config/* /home/seabot/.config/QGroundControl.org/
+    
+    cp -r /home/config/QGroundControl.org/* /home/seabot/.config/QGroundControl.org/
 
 #Deploying systemd service 
+   systemctl stop seabot_qgc.service
    systemctl daemon-reload
    systemctl enable seabot_qgc.service
    systemctl start seabot_qgc.service
-   systemctl status seabot_qgc.service
    echo "seabot_qgc debian package is installed successfully"
 
 
