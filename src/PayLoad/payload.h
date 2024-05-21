@@ -167,4 +167,46 @@ private:
 
 };
 
+
+class CommandExecutorThread : public QThread {
+    Q_OBJECT
+public:
+    explicit CommandExecutorThread(const QString &command, QObject *parent = nullptr);
+    explicit CommandExecutorThread(const QStringList &commands, QObject *parent = nullptr);
+    CommandExecutorThread(bool restartWeldSightFlag, QObject *parent = nullptr);
+    void run() override;
+
+signals:
+    void commandOutput(QString output);
+    void commandError(QString error);
+    void allCommandsFinished();
+
+private:
+    QString m_command;
+    QStringList m_commands;
+    bool m_multipleCommands = false;
+    bool m_restartWeldSight = false; 
+};
+
+
+class CommandExecutor : public QObject {
+    Q_OBJECT
+public:
+    explicit CommandExecutor(QObject *parent = nullptr);
+    Q_INVOKABLE void runCommand(const QString &command);
+    Q_INVOKABLE void runMultipleCommands(const QStringList &commands);
+    Q_INVOKABLE void restartWeldSight();
+
+signals:
+    void commandOutput(QString output);
+    void commandError(QString error);
+    void allCommandsFinished();
+
+private slots:
+    void handleCommandOutput(QString output);
+    void handleCommandError(QString error);
+private:
+    void connectSignals(CommandExecutorThread *thread);
+};
+
 #endif // PAYLOAD_H
