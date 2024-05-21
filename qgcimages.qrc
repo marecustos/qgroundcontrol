@@ -211,5 +211,6 @@
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>
         <file alias="robotic_arm.svg">src/ui/toolbar/Images/robotic_arm.svg</file>
         <file alias="olympios_icon.svg">src/ui/toolbar/Images/olympios_icon.svg</file>
+        <file alias="radar.png">src/ui/toolbar/Images/radar.png</file>
     </qresource>
 </RCC>

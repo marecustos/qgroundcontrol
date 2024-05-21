@@ -30,6 +30,7 @@ ApplicationWindow {
     minimumHeight:  ScreenTools.isMobile ? Screen.height : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     visible:        true
     property var payloadWindowObject : null
+    property var weldsightButtonEnabled : true
 
     Item {
         id: windowContent
@@ -57,6 +58,19 @@ ApplicationWindow {
 
         // Start the sequence of first run prompt(s)
         firstRunPromptManager.nextPrompt()
+    }
+
+    CommandExecutor{
+        id : commandExecutor
+    }
+
+    Timer {
+        id: disableTimer
+        interval: 25000
+        repeat: false
+        onTriggered: {
+            weldsightButtonEnabled = true
+        }
     }
 
     QtObject {
@@ -409,6 +423,39 @@ ApplicationWindow {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
                                 mainWindow.showOlympiosTool()
+                            }
+                        }
+                    }
+
+                    SubMenuButton {
+                        id:                 olympiosButton2
+                        height:             toolSelectDialog._toolButtonHeight
+                        Layout.fillWidth:   true
+                        text:               qsTr("Sonar")
+                        imageColor:         qgcPal.text
+                        imageResource:      "/qmlimages/olympios_icon.svg"
+                        onClicked: {
+                            if (!mainWindow.preventViewSwitch()) {
+                                toolSelectDialog.close()
+                            }
+                        }
+                    }
+
+                    SubMenuButton {
+                        id:                 radarButton
+                        height:             toolSelectDialog._toolButtonHeight
+                        Layout.fillWidth:   true
+                        text:               qsTr("Weld Sight")
+                        imageColor:         qgcPal.text
+                        imageResource:      "/qmlimages/radar.png"  
+                        enabled: weldsightButtonEnabled
+
+                        onClicked: {
+                            if (!mainWindow.preventViewSwitch()) {
+                                toolSelectDialog.close()
+                                weldsightButtonEnabled = false
+                                disableTimer.start()
+                                commandExecutor.restartWeldSight()
                             }
                         }
                     }
