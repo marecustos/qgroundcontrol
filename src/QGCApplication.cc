@@ -517,6 +517,7 @@ void QGCApplication::_initCommon()
     qmlRegisterType<NvidiaStateDetector>          (kQGCControllers,                       1, 0, "NvidiaStateDetector");
     qmlRegisterType<PayloadLogDownloader>          (kQGCControllers,                       1, 0, "PayloadLogDownloader");
     qmlRegisterType<SeabotVersionning>          (kQGCControllers,                       1, 0, "SeabotVersionning");
+    qmlRegisterType<CommandExecutor>          (kQGCControllers,                       1, 0, "CommandExecutor");
     qmlRegisterType<MonitorManager>                 (kQGCControllers,                        1, 0, "MonitorManager");
     qmlRegisterType<SyslinkComponentController>     (kQGCControllers,                       1, 0, "SyslinkComponentController");
     qmlRegisterType<EditPositionDialogController>   (kQGCControllers,                       1, 0, "EditPositionDialogController");

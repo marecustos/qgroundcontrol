@@ -432,3 +432,137 @@ int MonitorManager::findScreenIndexOtherThan(const QPoint &currentScreenCenter)
     }
     return -1;
 }
+
+CommandExecutorThread::CommandExecutorThread(const QString &command, QObject *parent)
+    : QThread(parent), m_command(command) {}
+
+CommandExecutorThread::CommandExecutorThread(const QStringList &commands, QObject *parent)
+    : QThread(parent), m_commands(commands), m_multipleCommands(true) {}
+
+CommandExecutorThread::CommandExecutorThread(bool restartWeldSightFlag, QObject *parent)
+    : QThread(parent), m_restartWeldSight(restartWeldSightFlag) {}
+
+void CommandExecutorThread::run() {
+    if (m_restartWeldSight) {
+        QProcess process;
+
+        // Run the power off command
+        process.start("VBoxManage", QStringList() << "controlvm" << "WSVM" << "acpipowerbutton");
+        if (!process.waitForFinished(-1)) {
+            emit commandError("Failed to run VBoxManage controlvm WSVM acpipowerbutton");
+            return;
+        }
+
+        QString output = process.readAllStandardOutput();
+        QString errorOutput = process.readAllStandardError();
+        emit commandOutput(output);
+        emit commandError(errorOutput);
+
+        // Check if VM is stopped
+        while (true) {
+            QThread::msleep(2000); // Add delay between checks
+            process.start("VBoxManage", QStringList() << "list" << "runningvms");
+            if (!process.waitForFinished()) {
+                emit commandError("Failed to run VBoxManage list runningvms");
+                return;
+            }
+
+            output = process.readAllStandardOutput();
+            errorOutput = process.readAllStandardError();
+            emit commandOutput(output);
+            emit commandError(errorOutput);
+
+            if (!output.contains("WSVM")) {
+                break;
+            }
+        }
+
+        // Start the VM
+        process.start("VBoxManage", QStringList() << "startvm" << "WSVM");
+        if (!process.waitForFinished(-1)) {
+            emit commandError("Failed to run VBoxManage startvm WSVM");
+            return;
+        }
+
+        output = process.readAllStandardOutput();
+        errorOutput = process.readAllStandardError();
+        emit commandOutput(output);
+        emit commandError(errorOutput);
+        emit allCommandsFinished();
+    } 
+    else if (m_multipleCommands) {
+        for (const QString &command : m_commands) {
+            QProcess process;
+            QStringList arguments = QProcess::splitCommand(command);
+            QString program = arguments.takeFirst();
+
+            process.start(program, arguments);
+
+            if (!process.waitForFinished(-1)) {
+                emit commandError("Failed to run command: " + command);
+                return;
+            }
+
+            QString output = process.readAllStandardOutput();
+            QString errorOutput = process.readAllStandardError();
+            emit commandOutput(output);
+            emit commandError(errorOutput);
+            QThread::msleep(2000);
+        }
+        emit allCommandsFinished();
+    } else {
+        QProcess process;
+        QStringList arguments = QProcess::splitCommand(m_command);
+        QString program = arguments.takeFirst();
+
+        process.start(program, arguments);
+
+        if (process.waitForFinished(-1)) {
+            QString output = process.readAllStandardOutput();
+            QString errorOutput = process.readAllStandardError();
+            emit commandOutput(output);
+            emit commandError(errorOutput);
+        } else {
+            emit commandError("Failed to run command");
+        }
+    }
+}
+
+CommandExecutor::CommandExecutor(QObject *parent)
+    : QObject(parent) {}
+
+void CommandExecutor::runCommand(const QString &command) {
+    CommandExecutorThread *thread = new CommandExecutorThread(command);
+    connectSignals(thread);
+    thread->start();
+}
+
+void CommandExecutor::runMultipleCommands(const QStringList &commands) {
+    CommandExecutorThread *thread = new CommandExecutorThread(commands);
+    connectSignals(thread);
+    connect(thread, &CommandExecutorThread::allCommandsFinished, this, &CommandExecutor::allCommandsFinished);
+    thread->start();
+}
+
+void CommandExecutor::restartWeldSight() {
+    CommandExecutorThread *thread = new CommandExecutorThread(true);
+    connectSignals(thread);
+    thread->start();
+}
+
+void CommandExecutor::handleCommandOutput(QString output) {
+    emit commandOutput(output);
+    qDebug()<<"output "<<output;
+}
+
+void CommandExecutor::handleCommandError(QString error) {
+    emit commandError(error);
+    qDebug()<<"error:  "<<error;
+}
+
+void CommandExecutor::connectSignals(CommandExecutorThread *thread) {
+    connect(thread, &CommandExecutorThread::commandOutput, this, &CommandExecutor::handleCommandOutput);
+    connect(thread, &CommandExecutorThread::commandError, this, &CommandExecutor::handleCommandError);
+    connect(thread, &CommandExecutorThread::allCommandsFinished, this, &CommandExecutor::allCommandsFinished);
+    connect(thread, &CommandExecutorThread::finished, thread, &CommandExecutorThread::deleteLater);
+}
