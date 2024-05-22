@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'release/*'
+      - Seabot_Stable_V4.3
 
 defaults:
   run:
