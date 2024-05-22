@@ -43,9 +43,12 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
+          git checkout -b update-version-${{ env.ARTIFACT_VERSION }}
           git add seabot-qgc-version
-          git commit -m "Increment version to ${{ env.ARTIFACT_VERSION }}"
-          git push origin HEAD:${{ github.ref }}
+          git commit -m "Increment version to $NEW_VERSION"
+          git push origin update-version-${{ env.ARTIFACT_VERSION }}
+          gh pr create --title "Increment version to $NEW_VERSION" --body "This PR increments the version to $NEW_VERSION." --base Seabot_Stable_V4.3 --head update-version-${{ env.ARTIFACT_VERSION }}
+
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
