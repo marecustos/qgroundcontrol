@@ -29,26 +29,18 @@ jobs:
       - name: Get all tags for correct version determination
         run: git fetch --all --tags -f --depth 1
 
-      - name: Read and increment version
+      - name: Determine and increment version
         id: increment_version
         run: |
-          VERSION_FILE=seabot-qgc-version
-          CURRENT_VERSION=$(cat $VERSION_FILE)
-          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v OFS=. '{$NF++;print}')
+          LAST_VERSION=$(git describe --tags --abbrev=0 || echo "0.0.0")
+          echo "Last version: $LAST_VERSION"
+          IFS='.' read -r -a version_parts <<< "$LAST_VERSION"
+          MAJOR=${version_parts[0]}
+          MINOR=${version_parts[1]}
+          PATCH=${version_parts[2]}
+          NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
           echo "New version: $NEW_VERSION"
-          echo $NEW_VERSION > $VERSION_FILE
           echo "ARTIFACT_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
-      - name: Commit new version
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git checkout -b update-version-${{ env.ARTIFACT_VERSION }}
-          git add seabot-qgc-version
-          git commit -m "Increment version to $NEW_VERSION"
-          git push origin update-version-${{ env.ARTIFACT_VERSION }}
-          gh pr create --title "Increment version to $NEW_VERSION" --body "This PR increments the version to $NEW_VERSION." --base Seabot_Stable_V4.3 --head update-version-${{ env.ARTIFACT_VERSION }}
-
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
@@ -104,7 +96,7 @@ jobs:
       - name: ccache post-run
         run: ccache -s
 
-      - name: Create Create Appimage
+      - name: Create Appimage
         working-directory: ${{ github.workspace }}
         run: |
           echo "start"
@@ -116,7 +108,7 @@ jobs:
           ls "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage"
 
       - name: Save artifact
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: QGroundControl.AppImage
           path: ${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage
