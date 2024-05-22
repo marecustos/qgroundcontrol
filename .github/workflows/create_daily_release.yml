@@ -1,0 +1,143 @@
+name: Create daily Release
+
+on:
+  push:
+    branches:
+      - 'release/*'
+      - Seabot_Stable_V4.3
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  SOURCE_DIR: ${{ github.workspace }}
+  QT_VERSION: 5.15.2
+  ARTIFACT_ARCH: amd64
+  BUILD_TYPE: DailyBuild
+  ARTIFACT_VERSION:
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Get all tags for correct version determination
+        run: git fetch --all --tags -f --depth 1
+
+      - name: Read and increment version
+        id: increment_version
+        run: |
+          VERSION_FILE=seabot-qgc-version
+          CURRENT_VERSION=$(cat $VERSION_FILE)
+          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v OFS=. '{$NF++;print}')
+          echo "New version: $NEW_VERSION"
+          echo $NEW_VERSION > $VERSION_FILE
+          echo "ARTIFACT_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit new version
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add seabot-qgc-version
+          git commit -m "Increment version to ${{ env.ARTIFACT_VERSION }}"
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          dir: ${{ runner.temp }}
+          modules: qtcharts qtwebengine
+          setup-python: true
+
+      - name: Install QGC source dependencies
+        run: sudo apt-get install -y libsdl2-dev
+
+      - name: Install Gstreamer
+        run: sudo apt-get install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-0:amd64 libgstreamer1.0-dev
+
+      - name: Install ccache
+        run: sudo apt-get install ccache
+
+      - name: Install post-link dependencies
+        run: sudo apt-get install -y binutils patchelf
+
+      - name: Prepare ccache timestamp
+        id: ccache_cache_timestamp
+        run: echo "name=timestamp::$(date --utc +'%Y-%m-%d-%H;%M;%S')" >> $GITHUB_OUTPUT
+
+      - name: ccache cache files
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: ${{ runner.os }}-ccache-
+
+      - name: Setup ccache
+        run: |
+          mkdir -p ~/.ccache
+          echo "base_dir = ${GITHUB_WORKSPACE}" > ~/.ccache/ccache.conf
+          echo "compression = true" >> ~/.ccache/ccache.conf
+          echo "compression_level = 5" >> ~/.ccache/ccache.conf
+          ccache -s
+          ccache -z
+
+      - name: Create build directory
+        run: mkdir ${{ runner.temp }}/shadow_build_dir
+
+      - name: Build
+        working-directory: ${{ runner.temp }}/shadow_build_dir
+        run: |
+          qmake -r ${SOURCE_DIR}/qgroundcontrol.pro CONFIG+=${BUILD_TYPE}
+          make -j2
+
+      - name: ccache post-run
+        run: ccache -s
+
+      - name: Create Create Appimage
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "start"
+          ls
+          pwd
+          echo "Create Appimage"
+          cd ${{ github.workspace }}/deploy
+          ./create_linux_appimage.sh ${{ github.workspace }} ${{ runner.temp }}/shadow_build_dir/staging ${{ runner.temp }}/shadow_build_dir/package
+          ls "${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage"
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: QGroundControl.AppImage
+          path: ${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage
+
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
+          name: Seabot_QGC DailyBuild ${{ env.ARTIFACT_VERSION }}_${{ env.ARTIFACT_ARCH }}
+          bodyFile: body.md
+          draft: false
+          prerelease: false
+          allowUpdates: true
+
+      - name: Upload Appimage
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ runner.temp }}/shadow_build_dir/package/QGroundControl.AppImage
+          asset_name: QGroundControl.AppImage
+          asset_content_type: application/octet-stream
