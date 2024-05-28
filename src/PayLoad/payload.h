@@ -196,6 +196,7 @@ private:
 
 class CommandExecutor : public QObject {
     Q_OBJECT
+    Q_PROPERTY(bool parentWindowOpen READ isParentWindowOpen NOTIFY parentWindowOpenChanged)
 public:
     explicit CommandExecutor(QObject *parent = nullptr);
     Q_INVOKABLE void runCommand(const QString &command);
@@ -208,17 +209,21 @@ signals:
     void commandOutput(QString output);
     void commandError(QString error);
     void allCommandsFinished();
+    void parentWindowOpenChanged();
 
 private slots:
     void handleCommandOutput(QString output);
     void handleCommandError(QString error);
     void toggleMask();
+    void closeOculus();
 
 private:
     void connectSignals(CommandExecutorThread *thread);
     QWidget *parentWindow = nullptr;
     QRegion originalMaskRegion;
     bool maskApplied = true;
+    bool m_parentWindowOpen;
+    bool isParentWindowOpen() const { return m_parentWindowOpen; }
 };
 
 

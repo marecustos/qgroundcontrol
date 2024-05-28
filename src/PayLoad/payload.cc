@@ -620,7 +620,7 @@ QWidget* CommandExecutor::reparentWindow(const QString &windowId) {
             parentWindow = new QWidget();
             QVBoxLayout *layout = new QVBoxLayout(parentWindow);
             CustomTitleBar *titleBar = new CustomTitleBar(parentWindow);
-            connect(titleBar, &CustomTitleBar::closeRequested, parentWindow, &QWidget::close);
+            connect(titleBar, &CustomTitleBar::closeRequested, this, &CommandExecutor::closeOculus);
             connect(titleBar, &CustomTitleBar::toggleMaskRequested, this, &CommandExecutor::toggleMask);
 
             layout->addWidget(titleBar);
@@ -638,6 +638,8 @@ QWidget* CommandExecutor::reparentWindow(const QString &windowId) {
             //parentWindow->setAttribute(Qt::WA_TranslucentBackground);
 
             // Return the parent window
+            m_parentWindowOpen = true;
+            emit parentWindowOpenChanged();
             return parentWindow;
         } else {
             qDebug() << "Failed to create QWindow from WinId";
@@ -647,6 +649,8 @@ QWidget* CommandExecutor::reparentWindow(const QString &windowId) {
     }
 
     // Return nullptr if something went wrong
+    m_parentWindowOpen = false;
+    emit parentWindowOpenChanged();
     return nullptr;
 }
 
@@ -660,4 +664,11 @@ void CommandExecutor::toggleMask()
         }
         maskApplied = !maskApplied;
     }
+}
+
+void CommandExecutor::closeOculus()
+{
+    parentWindow->close();
+    m_parentWindowOpen = false;
+    emit parentWindowOpenChanged();
 }

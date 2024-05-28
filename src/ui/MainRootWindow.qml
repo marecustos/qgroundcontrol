@@ -43,6 +43,9 @@ ApplicationWindow {
             if (event.key === Qt.Key_P) {
                 showPayloadTool()
             }
+            else if (event.key === Qt.Key_S){
+                showSonarTool()
+            }
         }
 
         // Your existing code...
@@ -225,6 +228,28 @@ ApplicationWindow {
 
     function showOlympiosTool() {
         showTool(qsTr("Olympios Sensor"), "olympios.qml", "/qmlimages/olympios_icon.svg")
+    }
+
+    function showSonarTool() {
+        if(!commandExecutor.parentWindowOpen){
+            var windowId = commandExecutor.getOculusWindowId();
+            parentWindow = commandExecutor.reparentWindow(windowId)
+
+            // Check if the parent window is valid and show it
+            if (parentWindow !== null) {
+                parentWindow.show()
+                parentWindow.close()
+                delay(500)
+
+                //reopen 
+                parentWindow = commandExecutor.reparentWindow(windowId)
+
+                // Check if the parent window is valid and show it
+                if (parentWindow !== null) {
+                    parentWindow.show()
+                }
+            }
+        }
     }
 
     function showSetupTool() {
@@ -448,24 +473,7 @@ ApplicationWindow {
                         onClicked: {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
-                                var windowId = commandExecutor.getOculusWindowId();
-                                parentWindow = commandExecutor.reparentWindow(windowId)
-
-                                // Check if the parent window is valid and show it
-                                if (parentWindow !== null) {
-                                    parentWindow.show()
-                                    parentWindow.close()
-                                    delay(500)
-
-                                    //reopen 
-                                    parentWindow = commandExecutor.reparentWindow(windowId)
-
-                                    // Check if the parent window is valid and show it
-                                    if (parentWindow !== null) {
-                                        parentWindow.show()
-                                    }
-                                }
-                                
+                                mainWindow.showSonarTool()
                             }
                         }
                     }
