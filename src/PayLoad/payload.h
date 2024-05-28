@@ -10,7 +10,12 @@
 
 #include <QGuiApplication>
 #include <QScreen>
-
+#include <QMouseEvent>
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QProcess>
 
 class  MultiVehicleManager;
 class  Vehicle;
@@ -196,6 +201,8 @@ public:
     Q_INVOKABLE void runCommand(const QString &command);
     Q_INVOKABLE void runMultipleCommands(const QStringList &commands);
     Q_INVOKABLE void restartWeldSight();
+    Q_INVOKABLE QWidget* reparentWindow(const QString &windowId);
+    Q_INVOKABLE QString getOculusWindowId();
 
 signals:
     void commandOutput(QString output);
@@ -205,8 +212,100 @@ signals:
 private slots:
     void handleCommandOutput(QString output);
     void handleCommandError(QString error);
+    void toggleMask();
+
 private:
     void connectSignals(CommandExecutorThread *thread);
+    QWidget *parentWindow = nullptr;
+    QRegion originalMaskRegion;
+    bool maskApplied = true;
 };
+
+
+class CustomTitleBar : public QWidget
+{
+    Q_OBJECT
+public:
+    CustomTitleBar(QWidget *parent = nullptr) : QWidget(parent), parentWindow(qobject_cast<QWidget*>(parent))
+    {
+        setFixedHeight(25);
+        setFixedWidth(700);
+        QHBoxLayout *layout = new QHBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        layout->addStretch();
+        layout->addStretch();
+        QLabel *titleLabel = new QLabel("Sonar");
+        layout->addWidget(titleLabel);
+        layout->addStretch();
+
+        toggleMaskButton = new QPushButton("Extend Settings");
+        toggleMaskButton->setFixedSize(120, 20);
+        connect(toggleMaskButton, &QPushButton::clicked, this, &CustomTitleBar::requestToggleMask);
+        layout->addWidget(toggleMaskButton);
+
+        QPushButton *closeButton = new QPushButton("X");
+        closeButton->setFixedSize(20, 20);
+        connect(closeButton, &QPushButton::clicked, this, &CustomTitleBar::closeWindow);
+        layout->addWidget(closeButton);
+    }
+
+signals:
+    void closeRequested();
+    void toggleMaskRequested();
+
+private slots:
+    void closeWindow()
+    {
+        QProcess process;
+        process.start("killall", QStringList() << "Oculus-ViewPoint");
+        process.waitForFinished(-1);
+        emit closeRequested();
+    }
+    void requestToggleMask()
+    {
+        emit toggleMaskRequested();
+        if (toggleMaskButton->text() == "Extend Settings") {
+            toggleMaskButton->setText("Hide Settings");
+        } else {
+            toggleMaskButton->setText("Extend Settings");
+        }
+    }
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            dragging = true;
+            dragStartPosition = event->globalPos();
+        }
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        if (dragging && (event->buttons() & Qt::LeftButton)) {
+            QPoint delta = event->globalPos() - dragStartPosition;
+            if (parentWindow) {
+                parentWindow->move(parentWindow->pos() + delta);
+                dragStartPosition = event->globalPos();
+            }
+        }
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            dragging = false;
+        }
+    }
+
+private:
+    bool dragging = false;
+    QPoint dragStartPosition;
+    QWidget *parentWindow = nullptr;
+    QPushButton *toggleMaskButton;
+};
+
+
 
 #endif // PAYLOAD_H

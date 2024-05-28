@@ -5,6 +5,10 @@
 #include "MultiVehicleManager.h"
 #include "LinkManager.h"
 #include <QWindow>
+#include <QVBoxLayout>
+#include <QApplication>
+#include <QStyle>
+
 
 QGC_LOGGING_CATEGORY(PayloadControllerLog, "PayloadControllerLog")
 
@@ -565,4 +569,95 @@ void CommandExecutor::connectSignals(CommandExecutorThread *thread) {
     connect(thread, &CommandExecutorThread::commandError, this, &CommandExecutor::handleCommandError);
     connect(thread, &CommandExecutorThread::allCommandsFinished, this, &CommandExecutor::allCommandsFinished);
     connect(thread, &CommandExecutorThread::finished, thread, &CommandExecutorThread::deleteLater);
+}
+
+QString CommandExecutor::getOculusWindowId() {
+    QProcess process1;
+    process1.start("killall", QStringList() << "Oculus-ViewPoint");
+    process1.waitForFinished(-1);
+    QProcess process;
+
+    // Load the bash script from the resource file
+    QFile scriptFile(":/bash/sonar_launch.sh");
+    if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        emit commandError("Failed to open the script file");
+        return QString();
+    }
+    QString scriptContent = QString::fromUtf8(scriptFile.readAll());
+
+    // Print the script content for debugging
+    qDebug() << "Script content:" << scriptContent;
+
+    // Start the process with the script content
+    process.start("bash", QStringList() << "-c" << scriptContent);
+    if (process.waitForFinished(-1)) {
+        QString output = process.readAllStandardOutput().trimmed();
+        QString errorOutput = process.readAllStandardError();
+        if (!errorOutput.isEmpty()) {
+            emit commandError(errorOutput);
+            return QString();
+        }
+        emit commandOutput(output);
+        return output;
+    } else {
+        emit commandError("Failed to get Oculus window ID");
+        return QString();
+    }
+}
+
+
+
+
+QWidget* CommandExecutor::reparentWindow(const QString &windowId) {
+    bool ok;
+    WId wid = windowId.toULong(&ok, 16); // Convert from hex string to WId
+    if (ok) {
+        QWindow *externalWindow = QWindow::fromWinId(wid);
+        if (externalWindow) {
+            QWidget *container = QWidget::createWindowContainer(externalWindow, nullptr);
+
+            // Create a new QWidget to act as the parent
+            parentWindow = new QWidget();
+            QVBoxLayout *layout = new QVBoxLayout(parentWindow);
+            CustomTitleBar *titleBar = new CustomTitleBar(parentWindow);
+            connect(titleBar, &CustomTitleBar::closeRequested, parentWindow, &QWidget::close);
+            connect(titleBar, &CustomTitleBar::toggleMaskRequested, this, &CommandExecutor::toggleMask);
+
+            layout->addWidget(titleBar);
+            layout->addWidget(container);
+            parentWindow->setLayout(layout);
+            parentWindow->resize(800, 600); // Set the size of the parent window
+            parentWindow->setWindowTitle("Parent Window");
+
+            // Create a mask to crop the left and right 100 pixels
+            originalMaskRegion = QRegion(75, 0, 650, 600); // X, Y, Width, Height
+            parentWindow->setMask(originalMaskRegion);
+
+            // Adjust the window flags to remove the frame and keep the title bar
+            parentWindow->setWindowFlags(Qt::FramelessWindowHint | Qt::Window | Qt::X11BypassWindowManagerHint);
+            //parentWindow->setAttribute(Qt::WA_TranslucentBackground);
+
+            // Return the parent window
+            return parentWindow;
+        } else {
+            qDebug() << "Failed to create QWindow from WinId";
+        }
+    } else {
+        qDebug() << "Failed to parse window ID";
+    }
+
+    // Return nullptr if something went wrong
+    return nullptr;
+}
+
+void CommandExecutor::toggleMask()
+{
+    if (parentWindow) {
+        if (maskApplied) {
+            parentWindow->clearMask();
+        } else {
+            parentWindow->setMask(originalMaskRegion);
+        }
+        maskApplied = !maskApplied;
+    }
 }

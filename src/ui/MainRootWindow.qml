@@ -31,6 +31,7 @@ ApplicationWindow {
     visible:        true
     property var payloadWindowObject : null
     property var weldsightButtonEnabled : true
+    property var parentWindow : null
 
     Item {
         id: windowContent
@@ -142,6 +143,16 @@ ApplicationWindow {
     /// Prevent view switching
     function pushPreventViewSwitch() {
         _rgPreventViewSwitch.push(true)
+    }
+
+    function delay(duration) { // In milliseconds
+        var timeStart = new Date().getTime();
+
+        while (new Date().getTime() - timeStart < duration) {
+            // Do nothing
+        }
+
+        // Duration has passed
     }
 
     /// Allow view switching
@@ -437,6 +448,24 @@ ApplicationWindow {
                         onClicked: {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
+                                var windowId = commandExecutor.getOculusWindowId();
+                                parentWindow = commandExecutor.reparentWindow(windowId)
+
+                                // Check if the parent window is valid and show it
+                                if (parentWindow !== null) {
+                                    parentWindow.show()
+                                    parentWindow.close()
+                                    delay(500)
+
+                                    //reopen 
+                                    parentWindow = commandExecutor.reparentWindow(windowId)
+
+                                    // Check if the parent window is valid and show it
+                                    if (parentWindow !== null) {
+                                        parentWindow.show()
+                                    }
+                                }
+                                
                             }
                         }
                     }
