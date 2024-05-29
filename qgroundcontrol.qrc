@@ -302,6 +302,9 @@
         
         
     </qresource>
+    <qresource prefix="/bash">
+        <file alias="sonar_launch.sh">src/PayLoad/sonar_launch.sh</file>
+    </qresource>
     <qresource prefix="/FirstRunPromptDialogs">
         <file alias="UnitsFirstRunPrompt.qml">src/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml</file>
         <file alias="OfflineVehicleFirstRunPrompt.qml">src/FirstRunPromptDialogs/OfflineVehicleFirstRunPrompt.qml</file>
