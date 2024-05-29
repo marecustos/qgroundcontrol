@@ -595,7 +595,6 @@ QString CommandExecutor::getOculusWindowId() {
         QString errorOutput = process.readAllStandardError();
         if (!errorOutput.isEmpty()) {
             emit commandError(errorOutput);
-            return QString();
         }
         emit commandOutput(output);
         return output;
