@@ -12,7 +12,7 @@ defaults:
 env:
   SOURCE_DIR: ${{ github.workspace }}
   QT_VERSION: 5.15.2
-  ARTIFACT_VERSION: 1.0.7
+  ARTIFACT_VERSION: 1.0.8
   ARTIFACT_ARCH: amd64
   BUILD_TYPE: StableBuild
 
