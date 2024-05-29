@@ -31,6 +31,7 @@ ApplicationWindow {
     visible:        true
     property var payloadWindowObject : null
     property var weldsightButtonEnabled : true
+    property var parentWindow : null
 
     Item {
         id: windowContent
@@ -41,6 +42,9 @@ ApplicationWindow {
         Keys.onPressed: {
             if (event.key === Qt.Key_P) {
                 showPayloadTool()
+            }
+            else if (event.key === Qt.Key_S){
+                showSonarTool()
             }
         }
 
@@ -144,6 +148,16 @@ ApplicationWindow {
         _rgPreventViewSwitch.push(true)
     }
 
+    function delay(duration) { // In milliseconds
+        var timeStart = new Date().getTime();
+
+        while (new Date().getTime() - timeStart < duration) {
+            // Do nothing
+        }
+
+        // Duration has passed
+    }
+
     /// Allow view switching
     function popPreventViewSwitch() {
         if (_rgPreventViewSwitch.length == 1) {
@@ -214,6 +228,28 @@ ApplicationWindow {
 
     function showOlympiosTool() {
         showTool(qsTr("Olympios Sensor"), "olympios.qml", "/qmlimages/olympios_icon.svg")
+    }
+
+    function showSonarTool() {
+        if(!commandExecutor.parentWindowOpen){
+            var windowId = commandExecutor.getOculusWindowId();
+            parentWindow = commandExecutor.reparentWindow(windowId)
+
+            // Check if the parent window is valid and show it
+            if (parentWindow !== null) {
+                parentWindow.show()
+                parentWindow.close()
+                delay(500)
+
+                //reopen 
+                parentWindow = commandExecutor.reparentWindow(windowId)
+
+                // Check if the parent window is valid and show it
+                if (parentWindow !== null) {
+                    parentWindow.show()
+                }
+            }
+        }
     }
 
     function showSetupTool() {
@@ -437,6 +473,7 @@ ApplicationWindow {
                         onClicked: {
                             if (!mainWindow.preventViewSwitch()) {
                                 toolSelectDialog.close()
+                                mainWindow.showSonarTool()
                             }
                         }
                     }
