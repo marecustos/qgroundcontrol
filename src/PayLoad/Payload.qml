@@ -57,12 +57,16 @@ Rectangle {
         Component.onCompleted:{
             seabotVersion.getQGCVersion()
             seabotVersion.getCompanionVersion()
+            seabotVersion.getSonarVersion()
         }
         onQgcVersion:{
             qgcVersionLabel.text = version
         }
         onCompanionVersion:{
             companionVerionLabel.text = version
+        }
+        onSonarVersion:{
+            sonarVersionLabel.text = version
         }
     }
 
@@ -419,6 +423,22 @@ Rectangle {
                                 QGCLabel {
                                     width:              _valueWidth
                                     text:               payload_controller.payloadStatus.linux_kernel_version
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                spacing:    ScreenTools.defaultFontPixelWidth
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                QGCLabel {
+                                    width:              _labelWidth
+                                    text:               qsTr("Sonar Version                                          : ")
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                QGCLabel {
+                                    id: sonarVersionLabel
+                                    width:              _valueWidth
+                                    text:               ""
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
