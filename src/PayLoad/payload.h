@@ -90,6 +90,7 @@ public:
 signals:
     void qgcVersion(QString version);
     void companionVersion(QString version);
+    void sonarVersion(QString version);
     void installationComplete(bool success, QString message);
 private:
     int m_command ;
@@ -108,11 +109,13 @@ public:
     ~SeabotVersionning(); 
     Q_INVOKABLE void getQGCVersion();
     Q_INVOKABLE void getCompanionVersion();
+    Q_INVOKABLE void getSonarVersion();
     Q_INVOKABLE void installDebPackage(const QString& debFilePath);
     static void broadcastCompanionVersion(QString version);
 signals:
     void qgcVersion(QString version);
     void companionVersion(QString version);
+    void sonarVersion(QString version);
     void installationComplete(bool success, QString message);
 private:
     static QList<SeabotVersionning*> instances;
