@@ -47,6 +47,7 @@ Item {
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property alias  _gripperMenu:           gripperOptions
+    property real _vehicleAltitude:     _activeVehicle ? _activeVehicle.altitudeRelative.rawValue : 0
 
     QGCToolInsets {
         id:                     _totalToolInsets
@@ -62,6 +63,10 @@ Item {
         bottomEdgeLeftInset:    virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeLeftInset : parentToolInsets.bottomEdgeLeftInset
         bottomEdgeCenterInset:  telemetryPanel.bottomEdgeCenterInset
         bottomEdgeRightInset:   virtualJoystickMultiTouch.visible ? virtualJoystickMultiTouch.bottomEdgeRightInset : parentToolInsets.bottomEdgeRightInset
+    }
+
+    on_VehicleAltitudeChanged: {
+        console.log(_vehicleAltitude)
     }
 
     FlyViewMissionCompleteDialog {
@@ -120,7 +125,7 @@ Item {
         anchors.margins:            _toolsMargin
         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
         anchors.right:              parent.right
-        width:                      _rightPanelWidth
+        width:                      QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue ? _rightPanelWidth * 1.3 : _rightPanelWidth * 3
         spacing:                    _toolsMargin
         visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
         availableHeight:            parent.height - y - _toolsMargin
@@ -284,6 +289,96 @@ Item {
         property real topEdgeLeftInset: visible ? y + height : 0
         property real leftEdgeTopInset: visible ? x + width : 0
     }
+
+    Rectangle {
+            id: rect
+            width: 120
+            height: 400
+            anchors.left: toolStrip.left
+            anchors.top: toolStrip.bottom
+            anchors.topMargin: 20
+            color: "black"
+
+            Item {
+                anchors.fill: parent
+
+                Rectangle {
+                    id: depthBar
+                    width: parent.width / 4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.bottom: depthLabel.top
+                    anchors.topMargin: 10 
+                    anchors.bottomMargin: 10 
+                    color: "blue"
+                    property var minimumValue: -getRange(_vehicleAltitude)
+                    property var maximumValue: 0
+
+                    function getRange(altitude) {
+                        if (altitude < -120) {
+                            return 150;
+                        }else if (altitude < -80) {
+                            return 120;
+                        } else if (altitude < -40) {
+                            return 80;
+                        } else if (altitude < -20) {
+                            return 40;
+                        }else if (altitude < -10) {
+                            return 20;
+                        } else {
+                            return 10;
+                        }
+                    }
+
+                    Rectangle {
+                        id: fill
+                        width: parent.width
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        color: "lightblue"
+                        height: (parent.height * (_vehicleAltitude - depthBar.minimumValue)) / (depthBar.maximumValue - depthBar.minimumValue)
+                    }
+
+                    Repeater {
+                        model: 10
+                        Rectangle {
+                            width: parent.width
+                            height: 2
+                            color: "white"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                            anchors.topMargin: index * (depthBar.height / 10)
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: 11
+                    QGCLabel {
+                        text: (depthBar.maximumValue + index * (depthBar.minimumValue - depthBar.maximumValue) / 10).toFixed(0) == 0 ? " "+(depthBar.maximumValue + index * (depthBar.minimumValue - depthBar.maximumValue) / 10).toFixed(0):(depthBar.maximumValue + index * (depthBar.minimumValue - depthBar.maximumValue) / 10).toFixed(0)
+                        color: "white"
+                        anchors.left: depthBar.right
+                        anchors.leftMargin: 5
+                        anchors.verticalCenter: parent.top
+                        anchors.verticalCenterOffset: index * (depthBar.height / 10) + 10
+                        font.family: ScreenTools.demiboldFontFamily
+                        font.pointSize: ScreenTools.mediumFontPointSize
+                    }
+                }
+
+                QGCLabel {
+                    id: depthLabel
+                    text: "Depth " + _vehicleAltitude.toString() + "\n (m) "
+                    color: "green"
+                    anchors.right: parent.right
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    font.family: ScreenTools.demiboldFontFamily
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
 
     GripperMenu {
         id: gripperOptions
