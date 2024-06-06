@@ -97,6 +97,7 @@ Rectangle {
 
         onTriggered: {
             payload_controller.sendPayloadNameRequest(404,"","",0)
+            payload_controller.publishRandomString()
             //console.log("Requesting Payload Name")
         }
     }

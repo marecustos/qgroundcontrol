@@ -48,6 +48,15 @@ PayloadController::PayloadController(void)
     connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &PayloadController::_setActiveVehicle);
     _setActiveVehicle(manager->activeVehicle());
     _link_manager = _toolbox->linkManager();
+
+    // Initialize ROS2
+    rclcpp::init(0, nullptr);
+    _node = rclcpp::Node::make_shared("payload_controller_node");
+    _publisher = _node->create_publisher<std_msgs::msg::String>("random_string", 10);
+}
+
+PayloadController::~PayloadController() {
+    rclcpp::shutdown(); // Properly shut down ROS2
 }
 void PayloadController::debug(void) {qCDebug(PayloadControllerLog) << "started payload";}
 void
@@ -166,6 +175,21 @@ void PayloadController::handleLogMessageChanged(const mavlink_play_tune_v2_t &lo
     qDebug() << logMessage;
     emit logMessageReceived(logMessage);
 
+}
+
+void PayloadController::publishRandomString()
+{
+    // Generate a random string
+    std::string chars = "hello world ";
+    chars += std::to_string(count);
+    count++;
+
+    // Create and publish the ROS2 message
+    auto message = std_msgs::msg::String();
+    message.data = chars;
+    _publisher->publish(message);
+
+    qDebug() << "Published random string: " << QString::fromStdString(chars);
 }
 
 PayloadLogDownloader::PayloadLogDownloader(void)

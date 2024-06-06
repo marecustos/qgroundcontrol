@@ -16,6 +16,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QProcess>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
 
 class  MultiVehicleManager;
 class  Vehicle;
@@ -130,9 +132,11 @@ class PayloadController : public QObject
 public:
 
     PayloadController(void);
+    ~PayloadController();
     Q_INVOKABLE void debug(void);
     Q_INVOKABLE void sendControlCommand(const QString& target , int value);
     Q_INVOKABLE void sendPayloadNameRequest(int payload_id , const QString& payload_name , const QString& payload_state , int result  );
+    Q_INVOKABLE void publishRandomString();
     QVariantMap payloadStatus() const;
     bool sendPayloadMessageOnLinkThreadSafe(LinkInterface* link, mavlink_message_t message);
     QString activePayloadName() const { return _activePayloadName; }
@@ -153,6 +157,9 @@ private:
     QGCToolbox* _toolbox = nullptr;
     LinkManager*  _link_manager = nullptr;
     QString _activePayloadName;
+    rclcpp::Node::SharedPtr _node; // ROS2 Node
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr _publisher; // ROS2 Publisher
+    int count = 0;
 
 };
 

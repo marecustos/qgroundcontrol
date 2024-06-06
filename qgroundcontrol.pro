@@ -1456,3 +1456,9 @@ LinuxBuild {
 
     INSTALLS += target share_qgroundcontrol share_icons share_metainfo share_applications
 }
+# ROS2 paths
+ROS2_DIR = /opt/ros/foxy
+
+# Include ROS2 headers
+INCLUDEPATH += $$ROS2_DIR/include
+LIBS += -L$$ROS2_DIR/lib -lrcl -lrclcpp  -lrcutils -lstd_msgs__rosidl_typesupport_cpp
