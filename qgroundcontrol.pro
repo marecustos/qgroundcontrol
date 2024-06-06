@@ -1461,4 +1461,4 @@ ROS2_DIR = /opt/ros/foxy
 
 # Include ROS2 headers
 INCLUDEPATH += $$ROS2_DIR/include
-LIBS += -L$$ROS2_DIR/lib -lrcl -lrclcpp  -lrcutils -lstd_msgs__rosidl_typesupport_cpp
+LIBS += -L$$ROS2_DIR/lib -lrcl -lrclcpp  -lrcutils -lstd_msgs__rosidl_typesupport_cpp -ltracetools -lstatistics_msgs__rosidl_typesupport_cpp -llibstatistics_collector

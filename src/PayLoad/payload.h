@@ -159,6 +159,10 @@ private:
     QString _activePayloadName;
     rclcpp::Node::SharedPtr _node; // ROS2 Node
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr _publisher; // ROS2 Publisher
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr _subscriber;
+    std::thread _ros_thread;
+
+    void messageCallback(const std_msgs::msg::String::SharedPtr msg);
     int count = 0;
 
 };

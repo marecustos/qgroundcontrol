@@ -53,10 +53,20 @@ PayloadController::PayloadController(void)
     rclcpp::init(0, nullptr);
     _node = rclcpp::Node::make_shared("payload_controller_node");
     _publisher = _node->create_publisher<std_msgs::msg::String>("random_string", 10);
+    _subscriber = _node->create_subscription<std_msgs::msg::String>(
+        "/far5", 10,
+        std::bind(&PayloadController::messageCallback, this, std::placeholders::_1)
+    );
+    _ros_thread = std::thread([this]() {
+        rclcpp::spin(_node);
+    });
 }
 
 PayloadController::~PayloadController() {
-    rclcpp::shutdown(); // Properly shut down ROS2
+    rclcpp::shutdown();
+    if (_ros_thread.joinable()) {
+        _ros_thread.join();
+    }
 }
 void PayloadController::debug(void) {qCDebug(PayloadControllerLog) << "started payload";}
 void
@@ -190,6 +200,12 @@ void PayloadController::publishRandomString()
     _publisher->publish(message);
 
     qDebug() << "Published random string: " << QString::fromStdString(chars);
+}
+
+
+void PayloadController::messageCallback(const std_msgs::msg::String::SharedPtr msg)
+{
+    qDebug() << "Received message:" << QString::fromStdString(msg->data);
 }
 
 PayloadLogDownloader::PayloadLogDownloader(void)

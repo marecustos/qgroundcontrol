@@ -15,4 +15,4 @@ docker run \
     -v /etc/udev:/etc/udev \
     -v  ~/.config:/home/user/.config \
     qgc-linux-docker \
-    /project/seabot_qgc/staging/QGroundControl
+    bash -c "ls /opt && source /opt/ros/foxy/setup.bash && /project/seabot_qgc/staging/QGroundControl"
