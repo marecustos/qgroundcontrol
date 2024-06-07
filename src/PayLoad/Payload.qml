@@ -171,6 +171,7 @@ Rectangle {
                                         var name = nameField.text
                                         // Create new link configuration
                                         editingConfig = QGroundControl.linkManager.createConfiguration(index, name)
+                                        linksettingsLoader.subEditConfig = editingConfig
                                     }
                                 }
                             }

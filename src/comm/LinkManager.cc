@@ -798,17 +798,8 @@ bool LinkManager::endConfigurationEditing(LinkConfiguration* config, LinkConfigu
 
 bool LinkManager::endConfigurationEditingPayload(LinkConfiguration* editedConfig)
 {
-    qCDebug(LinkManagerLog) << editedConfig->name();
-    if (_rgPayloadLinkConfig.get() && editedConfig) {
-        _rgPayloadLinkConfig.get()->copyFrom(editedConfig);
-        saveLinkConfigurationList();
-        emit _rgPayloadLinkConfig.get()->nameChanged(_rgPayloadLinkConfig.get()->name());
-        // Discard temporary duplicate
-        //delete editedConfig;
-    } else {
-        qWarning() << "Internal error";
-    }
-    return true;
+    removeConfiguration(_rgPayloadLinkConfig.get());
+    return endCreateConfigurationPayload(editedConfig);
 }
 
 bool LinkManager::endCreateConfiguration(LinkConfiguration* config)
