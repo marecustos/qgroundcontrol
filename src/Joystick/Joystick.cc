@@ -16,7 +16,7 @@
 #include "VideoManager.h"
 #include "QGCCameraManager.h"
 #include "QGCCameraControl.h"
-
+#include "ParameterManager.h"
 #include <QSettings>
 
 // JoystickLog Category declaration moved to QGCLoggingCategory.cc to allow access in Vehicle
@@ -140,6 +140,34 @@ void Joystick::setInPayloadPage(bool value) {
     if (Joystick::_inPayloadPage != value) {
         Joystick::_inPayloadPage = value;
         emit inPayloadPageChanged();
+    }
+}
+
+void Joystick::TrimPitchTo(Fact* fact, float value)
+{
+    WeakLinkInterfacePtr weakLink = _activeVehicle->vehicleLinkManager()->primaryLink();
+
+    if (!weakLink.expired()) {
+        mavlink_param_set_t     p;
+        SharedLinkInterfacePtr  sharedLink = weakLink.lock();
+
+        memset(&p, 0, sizeof(p));
+
+        p.param_type = ParameterManager::factTypeToMavType(fact->type());
+
+        p.param_value = value;
+        p.target_system = (uint8_t)_activeVehicle->id();
+        p.target_component = (uint8_t)fact->componentId();
+
+        strncpy(p.param_id, "AHRS_TRIM_Y", sizeof(p.param_id));
+
+        mavlink_message_t msg;
+        mavlink_msg_param_set_encode_chan(qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+                                          qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+                                          sharedLink->mavlinkChannel(),
+                                          &msg,
+                                          &p);
+        _activeVehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
     }
 }
 
