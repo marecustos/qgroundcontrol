@@ -813,6 +813,8 @@ void ParameterManager::_sendParamSetToVehicle(int componentId, const QString& pa
         mavlink_param_union_t   union_value;
         SharedLinkInterfacePtr  sharedLink = weakLink.lock();
 
+        if(paramName.toStdString() == "AHRS_TRIM_Y")emit(ahrsTrimYUpdated(value.toFloat()));
+
         memset(&p, 0, sizeof(p));
 
         p.param_type = factTypeToMavType(valueType);
