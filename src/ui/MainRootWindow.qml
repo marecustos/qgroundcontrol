@@ -32,6 +32,7 @@ ApplicationWindow {
     property var payloadWindowObject : null
     property var weldsightButtonEnabled : true
     property var parentWindow : null
+    property var _ahrsTrimYhardcoded: flightView.ahrs_trim_y_hardcoded
 
     Item {
         id: windowContent

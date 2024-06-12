@@ -102,6 +102,7 @@ signals:
     void loadProgressChanged        (float value);
     void pendingWritesChanged       (bool pendingWrites);
     void factAdded                  (int componentId, Fact* fact);
+    void ahrsTrimYUpdated           (float value);
 
 private slots:
     void    _factRawValueUpdated                (const QVariant& rawValue);
