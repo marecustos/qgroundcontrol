@@ -98,4 +98,22 @@ Row {
         color:                  nvidiaON == true? "green": "red"
     }
 
+    QGCLabel {
+        anchors.margins:    _margin
+        anchors.top:        parent.top
+        anchors.bottom:     parent.bottom
+        text:               qsTr("AHRS TRIM Y : ")
+        font: ScreenTools.defaultFontPointSize
+        property real _margin: ScreenTools.defaultFontPixelWidth 
+    }
+
+    QGCLabel {
+        anchors.margins:    _margin
+        anchors.top:        parent.top
+        anchors.bottom:     parent.bottom
+        text:               mainWindow._ahrsTrimYhardcoded
+        font: ScreenTools.defaultFontPointSize
+        property real _margin: ScreenTools.defaultFontPixelWidth 
+    }
+
 }

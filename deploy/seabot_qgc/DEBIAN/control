@@ -1,5 +1,5 @@
 Package: seabot-qgc
-Version: 1.0.8
+Version: 1.0.9
 Architecture: amd64
 Depends: libpulse-mainloop-glib0, python3, python3-pip, gstreamer1.0-plugins-bad, gstreamer1.0-libav, gstreamer1.0-gl, libfuse2, libxcb-xinerama0, libxkbcommon-x11-0, libxcb-cursor0, espeak, libsdl1.2debian, wmctrl
 Maintainer: Ridha MASTOURI <mastouri.rms@gmail.com>

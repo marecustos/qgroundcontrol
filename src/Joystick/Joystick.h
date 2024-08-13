@@ -153,6 +153,7 @@ public:
 
     bool inPayloadPage();
     Q_INVOKABLE void setInPayloadPage(bool value);
+    Q_INVOKABLE void TrimPitchTo(Fact* fact , float value);
 
     int   throttleMode      ();
     void  setThrottleMode   (int mode);

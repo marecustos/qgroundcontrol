@@ -367,6 +367,18 @@ void SeabotVersionningThread::run()
         }
 
     }
+    else if (m_command == 3){
+        QProcess process;
+        process.start("dpkg-query", QStringList() << "-f" << "${Version}" << "-W" << "oculus-viewpoint");
+        if (!process.waitForFinished()) {
+            // Failed to execute the command
+            emit qgcVersion("");
+        } else {
+            QByteArray output = process.readAllStandardOutput();
+            QString version = QString::fromLatin1(output).trimmed();
+            emit sonarVersion(version);
+        }
+    }
 }
 QList<SeabotVersionning*> SeabotVersionning::instances;
 
@@ -410,6 +422,14 @@ void SeabotVersionning::installDebPackage(const QString& debFilePath)
     connect(thread, &SeabotVersionningThread::installationComplete, this, &SeabotVersionning::installationComplete);
     thread->start();
 }
+
+void SeabotVersionning::getSonarVersion(void)
+{
+    SeabotVersionningThread *thread = new SeabotVersionningThread(3);
+    connect(thread, &SeabotVersionningThread::sonarVersion, this, &SeabotVersionning::sonarVersion);
+    thread->start();
+}
+
 MonitorManager::MonitorManager(QObject *parent) : QObject(parent)
 {
 }

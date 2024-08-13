@@ -55,15 +55,76 @@ Item {
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
     property var    _mapControl:            mapControl
+    property var ahrs_trim_y_hardcoded : 0.01
+    property var shift_clicked : 0
+    property var  _activeJoystick:          joystickManager.activeJoystick
+    property var pitch_increment_step : 1 //pitch increment step in degrees
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
+    property var paramMgr : _activeVehicle.parameterManager
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
         toolstrip.adjustToolInset(newToolInset)
         if (QGroundControl.corePlugin.options.instrumentWidget) {
             flightDisplayViewWidgets.adjustToolInset(newToolInset)
+        }
+    }
+
+    Timer {
+        //we use this timer to wait for active vehicle to be updated in joystick class
+        id: delayedExecutionTimer
+        interval: 200 
+        repeat: false
+        onTriggered: {
+            if (_activeJoystick && _activeVehicle) {
+                _activeJoystick.TrimPitchTo(_activeVehicle.pitch, 0);
+                ahrs_trim_y_hardcoded = 0
+            }
+        }
+    }
+
+    function resetPitchTrim() {
+        delayedExecutionTimer.start();
+    }
+
+    on_ActiveVehicleChanged:{
+        resetPitchTrim()
+    }
+
+    on_ActiveJoystickChanged:{
+        resetPitchTrim()
+    }
+
+    function increasePitchTrim(){
+        ahrs_trim_y_hardcoded = ahrs_trim_y_hardcoded - pitch_increment_step;
+        _activeJoystick.TrimPitchTo( _activeVehicle.pitch , ahrs_trim_y_hardcoded * 3.14/180 )
+    }
+
+    function decreasePitchTrim() {
+        ahrs_trim_y_hardcoded = ahrs_trim_y_hardcoded + pitch_increment_step;
+        _activeJoystick.TrimPitchTo( _activeVehicle.pitch , ahrs_trim_y_hardcoded * 3.14/180 )
+    }
+
+    Connections {
+        target:     _activeJoystick
+        onRawButtonPressedChanged: {
+            if(index == 5 ) shift_clicked = pressed
+            if(index == 11 && shift_clicked && pressed )
+            {
+                increasePitchTrim()
+            }
+            if(index == 12 && shift_clicked && pressed ) {
+                decreasePitchTrim()
+            }
+        }
+    }
+
+    Connections {
+        target:     paramMgr
+        onAhrsTrimYUpdated:{
+            ahrs_trim_y_hardcoded = Math.round(value*180/3.14)
         }
     }
 
