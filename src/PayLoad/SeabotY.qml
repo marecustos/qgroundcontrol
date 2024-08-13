@@ -198,11 +198,11 @@ Rectangle {
 
             QGCLabel {
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("Light                                             ")
+                text: qsTr("                                             ")
             }
             ControlButton {
                 id : lightF
-                targetCommand: "light"
+                targetCommand: "lightBrightnessRelative"
                 valueCommand: +1
                 onControlButtonPressed: {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
@@ -211,7 +211,7 @@ Rectangle {
             }
             ControlButton {
                 id : lightB
-                targetCommand: "light"
+                targetCommand: "lightBrightnessRelative"
                 valueCommand: -1
                 onControlButtonPressed: {
                     payload_controller.sendControlCommand(targetCommand,valueCommand)
